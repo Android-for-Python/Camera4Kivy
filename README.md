@@ -1,7 +1,7 @@
 Camera4Kivy
 ===========
 
-*Yet Another Kivy Camera*
+*Yet Another Camera for Kivy*
 
 This document has seven sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior), and [Known Issues](https://github.com/Android-for-Python/camera4kivy#known-issues).
 
@@ -27,7 +27,7 @@ In Python
     self.preview = Preview(aspect_ratio = '16:9')
 ```
 
-To connect the camera unit to the Preview call the preview's `connect_camera()` method. The connect_camera method has optional parameters, for example enabling the image analysis api. 
+To connect the camera unit to the Preview call the preview's `connect_camera()` method. The `connect_camera()` method has optional parameters, for example, enabling the image analysis api. 
 
 ```python
     self.preview.connect_camera(enable_analyze_pixels = True)
@@ -42,12 +42,12 @@ Well behaved apps disconnect the camera when it is no longer in use. It is impor
 To take a photo:
 
 ```python
-   self.preview.capture_photo()
+    self.preview.capture_photo()
 ```
 
 The captured file location may be specified and is also reported in a callback. A data analysis api allows per frame analysis and preview annotation or preview image replacement.
 
-On Android a pinch/spread gesture controls zoom, and a tap overrides any automatic focus and metering (if available). Some connect_camera options are platform specific.
+On Android a pinch/spread gesture controls zoom, and a tap overrides any automatic focus and metering (if available). Some `connect_camera()` options are platform specific.
 
 ## Install
 
@@ -65,13 +65,13 @@ Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most 
 | Linux       | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
 |             | [OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
 | Rasberry    | [Picamera](https://github.com/Android-for-Python/camera4kivy#picamera)    | <= Buster      |
-|             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#pycamera2)   | >= Bullseye    |
+|             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#picamera2)   | >= Bullseye    |
 |             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
 |             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
-| Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camerax_provider)                      |]| Android >= 5.0 |
+| Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camerax_provider)                      |  Android >= 5.0 |
 | iOS         | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)                      |
 
-Some camera provider specific behavior should be expected. For example a switch to a camera that does not exist will be ignored on MacOS and Rasberry Pi, but generate a screen message with OpenCV or GStreamer. Camera resolution defaults to the maximum available sensor resolution, except on Raspberry Pi where the default is (1024, 768).
+Like Kivy the first available provider is selected. Some camera provider specific behavior should be expected. For example a switch to a camera that does not exist will be ignored on MacOS and Rasberry Pi, but generate a screen message with OpenCV or GStreamer. Camera resolution defaults to the maximum available sensor resolution, except on Raspberry Pi where the default is (1024, 768).
 
 #### Android camerax_provider
 
@@ -140,13 +140,13 @@ Required when capturing photo, screenshot, or video and saving to shared storage
 
 ## Examples
 
-A prerequisite is a working camera is installed. Test this with the platform's camera app before proceeding. All examples use the platform specific camera provider, and assume the typical default camera_id of '0'. If you find the example does not connect to a camera review your camera provider choice.
+A prerequisite is that a working camera is installed. Test this with the platform's camera app before proceeding. All examples use the platform specific camera provider, and assume the typical default camera_id of '0'. If you find the example does not connect to a camera review the available camera ids and your camera provider choice.
 
 ### Tested Examples and Platforms 
 
 The Photo example illustrates basic camera usage, try this first. The remaining examples illustrate image analysis using various packages. Not tested : iOS, set your expectations accordingly.
 
-On Android `orientation = all` is available, on the desktop you can change the window size to simulate orientation and rotating a mobile device. 
+On Android `orientation = all` is available, on the desktop you can change the window size to simulate orientation, and thus rotating a mobile device. 
 
 | Example | Windows | Macos | Linux | Android | iOS | Coral |
 |---------|---------|-------|-------|---------|-----|-------|
@@ -156,27 +156,28 @@ On Android `orientation = all` is available, on the desktop you can change the w
 | MLKit | | | | :heavy_check_mark: | | |
 | TFLite   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | :heavy_check_mark: |
 
-Windows : Windows 11, i7-10 @ 1.1GHz
-Macos   : Big Sur,  i5-10 @ @ 1.1GHz
-Linux   : Raspberry Buster, Cortex-A72 @ 1.5GHz
-Android : Android 12, Pixel 5
-iOS     : not tested
-Coral   : [Accelerator](https://coral.ai/products/accelerator) tested with Windows 11 , gave very approximately an order of magnitude speed up.
+- Windows : Windows 11, i7-10 @ 1.1GHz
+- Macos   : Big Sur,  i5-10 @ @ 1.1GHz
+- Linux   : Raspberry Buster, Cortex-A72 @ 1.5GHz
+- Android : Android 12, Pixel 5
+- Android : Android 6, Nexus 5
+- iOS     : not tested
+- Coral   : [Accelerator](https://coral.ai/products/accelerator) tested with Windows 11 , gave very approximately an order of magnitude speed up.
 
-### C4K-Photo-Example
-Basic layout using screens. Basic camera functionality including photo capture, screenshot capture, and on Android capture of video with audio.
+### [C4K-Photo-Example](https://github.com/Android-for-Python/c4k_photo_example)
+Illustrates basic layout using screens. Basic camera functionality including photo capture, screenshot capture, and on Android capture of video with audio.
 On Raspberry PI a mouse must be used, a touch pad does not work correctly.
 
-### C4K-QR-Example.
+### [C4K-QR-Example](https://github.com/Android-for-Python/c4k_qr_example)
 Everything you need to read a restaurant menu. Long press or double tap on a highlighted QR code to open a webrowser. Illustrates basic analysis, screen annotation, and user interaction. 
 
-### C4K-OpenCV-Example.
+### [C4K-OpenCV-Example.](https://github.com/Android-for-Python/c4k_opencv_example)
 Edge detect the video stream. Illustrates using OpenCV analysis and replacing the original preview with the transformed image.
 
-### C4K-MLKit-Example
+### [C4K-MLKit-Example](https://github.com/Android-for-Python/c4k_mlkit_example)
 Face detect, MLKit is Android only. Illustrates using the ImageProxy api.
 
-### C4K-TFLite-Example
+### [C4K-TFLite-Example](https://github.com/Android-for-Python/c4k_tflite_example)
 Object classification. Illustrates a computationally expensive algorithm (not necessarily a characteristic of Tensorflow Lite), and writing text to the Preview image.
 
 ## Preview Widget
@@ -194,7 +195,7 @@ A string property. Either '4:3' (default) or '16:9'.
 A color property. Geometry tells us that layout of a fixed aspect ratio widget almost always results in letterboxing. Art tells us we can hide letterboxes by filling them with a color that matches the surrounding widgets. 
 
 #### orientation
-A string property. One of 'portrait' , 'landscape', 'same', 'opposite'.  The default is the 'same' as the device or window. Best not to change this until you have read [this section](). 
+A string property. One of 'portrait' , 'landscape', 'same', 'opposite'.  The default is the 'same' as the device or window. This choice modifies effective resolution, [see](https://github.com/Android-for-Python/camera4kivy#cropped-sensor-resolution). 
 
 ### Preview Widget API
 
@@ -212,10 +213,10 @@ Optional arguments:
 Specify which camera to connect to. For example `camera_id = 'front'`. A string containing an integer (default '0'), or on Android 'back' (default), or 'front'.
 
 ##### mirror
-Boolean default True. For example `mirror = False`. Ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored.
+Boolean default True. Mirrors the preview image. Ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored.
 
 ##### filepath_callback
-On a capture of a photo, video, or screenshot, this callback returns the path and name of the saved file. For example `filepath_callback = my_method`, where `my_method` is an app supplied method with a string argument.
+On a capture of a photo, video, or screenshot, this callback returns the path and name of the saved file. For example `filepath_callback = my_method`, where `def my_method(self, path):` is an app supplied method with a string argument.
 
 ##### sensor_resolution
 Overrides the default sensor resolution, which is the highest resolution available, except Raspberry Pi where it is (1024, 768). Tuple of two integers, for example `sensor_resolution = (640, 480)`. The resulting capture resolution obtained depends on the behavior of the camera provider (for example it is ignored by GStreamer). The capture resolution also depends on the relative orientation and aspect ratio of the Preview. Treat the value specified as a request that may not be exactly honored.
@@ -348,11 +349,15 @@ This is a phyical property of the sensor module. The default behavior of `connec
 
 #### Cropped Sensor Resolution
 
-The sensor resolution cropped according to the orientation of the sensor, the orientation of the Preview, and the aspect ratio of the Preview.
+The sensor resolution cropped according to the orientation of the sensor, the orientation of the Preview, and the aspect ratio of the Preview. The will impact the capture resolution, for example a 16:9 aspect image maybe cropped from a 4:3 sensor image. Thus the product of width and height will less for 16:9 that for 4:3 in this case.
+
+Rotating a mobile device also rotates the sensor, the highest resolution images are obtained when the Priview widget orientation is the same as the device orientation. Conversly for example a landscape preview with the device in portrait orientation will result in an image width resolution that is the sensor height resolution.
+
+This behaviour is a characteric of the camera having a physical constraint resolution. It is mostly transparent to the app user unless the sensor resolution is low, or a photo capture has lower than expected resolution.
 
 #### Preview Resolution
 
-Is a physical property of the screen (display resolution) and the Preview widget size on the screen. The preview resolution can be less than or greater than the sensor resolution.
+Is a physical property of the screen (display resolution) and the Preview widget size on the screen. The preview resolution can be less than or greater than the cropped sensor resolution.
 
 #### Capture Resolution
 
@@ -379,7 +384,7 @@ Some things probably don't work yet, set your expectations accordingly or kick b
 
 ### Issue: Raspberry PI video frame rate is lower than other platforms.
 
-Functional, but low. The issue is probably either in the picamera package or the design of the Kivy camera provider wrapper. A gating item would be the [picamera2 package](https://www.raspberrypi.com/news/bullseye-camera-system/) which is in development.  
+Functional, but low. The issue is probably either in the picamera package and the way it is used. Perhaps [Picamera2](https://www.raspberrypi.com/news/bullseye-camera-system/) which is in development will address this.  
 
 ### Issue: Android Rotation
 
