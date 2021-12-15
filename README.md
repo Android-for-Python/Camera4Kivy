@@ -13,7 +13,7 @@ Available on all the usual platforms.
 from camera4kivy import Preview
 ```
 
-Camera4Kivy consists of a `Preview` widget with an api to connect it to the physical camera unit. The Preview widget layout is [configured](https://github.com/Android-for-Python/Camera4Kivy#preview-widget-properties) with Kivy properties, the camera and image analysis behavior are configured with an [api](https://github.com/Android-for-Python/Camera4Kivy#preview-widget-api). For example:
+Camera4Kivy consists of a `Preview` widget with an api to connect to the physical camera unit. The Preview widget layout is [configured with Kivy properties](https://github.com/Android-for-Python/Camera4Kivy#preview-widget-properties) , the camera unit and image analysis behavior are [configured with an api](https://github.com/Android-for-Python/Camera4Kivy#preview-widget-api). For example:
 
 In .kv
 ```
@@ -169,7 +169,7 @@ Illustrates basic layout using screens. Basic camera functionality including pho
 On Raspberry PI a mouse must be used, a touch pad does not work correctly.
 
 ### [C4K-QR-Example](https://github.com/Android-for-Python/c4k_qr_example)
-Everything you need to read a restaurant menu. Long press or double tap on a highlighted QR code to open a webrowser. Illustrates basic analysis, screen annotation, and user interaction. 
+Everything you need to read a restaurant menu. Long press or double click on a highlighted QR code to open a webrowser. Illustrates basic analysis, screen annotation, and user interaction. 
 
 ### [C4K-OpenCV-Example.](https://github.com/Android-for-Python/c4k_opencv_example)
 Edge detect the video stream. Illustrates using OpenCV analysis and replacing the original preview with the transformed image.
@@ -178,7 +178,7 @@ Edge detect the video stream. Illustrates using OpenCV analysis and replacing th
 Face detect, MLKit is Android only. Illustrates using the ImageProxy api.
 
 ### [C4K-TFLite-Example](https://github.com/Android-for-Python/c4k_tflite_example)
-Object classification. Illustrates a computationally expensive algorithm (not necessarily a characteristic of Tensorflow Lite), and writing text to the Preview image.
+Object classification. Illustrates using a large Tensorflow Lite model, and writing text to the Preview image.
 
 ## Preview Widget
 
@@ -186,7 +186,7 @@ An app can have multiple `Preview` widgets, but only one can be connected to the
 
 ### Preview Widget Properties
 
-The widget has these Kivy properties:
+The widget has these Kivy properties that configure its layout:
 
 #### aspect_ratio
 A string property. Either '4:3' (default) or '16:9'. 
@@ -195,7 +195,7 @@ A string property. Either '4:3' (default) or '16:9'.
 A color property. Geometry tells us that layout of a fixed aspect ratio widget almost always results in letterboxing. Art tells us we can hide letterboxes by filling them with a color that matches the surrounding widgets. 
 
 #### orientation
-A string property. One of 'portrait' , 'landscape', 'same', 'opposite'.  The default is the 'same' as the device or window. This choice modifies effective resolution, [see](https://github.com/Android-for-Python/camera4kivy#cropped-sensor-resolution). 
+A string property. One of 'portrait' , 'landscape', 'same', 'opposite'.  The default is the 'same' as the device or window. This choice modifies effective resolution, [see](https://github.com/Android-for-Python/camera4kivy#cropped-sensor-resolution). The best resolution is always obtained with 'same'.
 
 ### Preview Widget API
 
@@ -298,7 +298,7 @@ Android only, if available on device. Called by a tap gesture unless disabled
 
 ### Overview
 
-Implement video data analysis by creating a subclass of `Preview` and defining two methods. One to analyze the frame the second to update the Preview image. In general like this:
+Implement video data analysis by creating a subclass of `Preview` and defining two methods. One to analyze the frame, the second to create and annotate the Preview image. In general like this:
 
 ```python
 class CustomAnalyzer(Preview):
@@ -315,7 +315,7 @@ class CustomAnalyzer(Preview):
 
 ### Examples
 
-Wondering what this pattern looks like in practice? Look at some examples: [QR Reader](https://github.com/Android-for-Python/C4K_QR/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/C4K_ocv/edgedetect.py).
+Wondering what this pattern looks like in practice? Look at two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/edgedetect.py).
 
 ### Implementation Details
 
