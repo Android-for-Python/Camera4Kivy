@@ -13,7 +13,7 @@ Available on all the usual platforms.
 from camera4kivy import Preview
 ```
 
-Camera4Kivy consists of a `Preview` widget with an api to connect it to the physical camera unit. The Preview has optional layout properties, for example:
+Camera4Kivy consists of a `Preview` widget with an api to connect it to the physical camera unit. The Preview widget layout is [configured](https://github.com/Android-for-Python/Camera4Kivy#preview-widget-properties) with Kivy properties, the camera and image analysis behavior are configured with an [api](https://github.com/Android-for-Python/Camera4Kivy#preview-widget-api). For example:
 
 In .kv
 ```
@@ -27,7 +27,7 @@ In Python
     self.preview = Preview(aspect_ratio = '16:9')
 ```
 
-To connect the camera unit to the Preview call the preview's `connect_camera()` method. The `connect_camera()` method has optional parameters, for example, enabling the image analysis api. 
+To connect the camera unit to the Preview call the preview's `connect_camera()` method. For example to connect the camera with the image analysis api enabled:
 
 ```python
     self.preview.connect_camera(enable_analyze_pixels = True)
