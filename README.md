@@ -160,7 +160,7 @@ On Android `orientation = all` is available, on the desktop you can change the w
 - Macos   : Big Sur,  i5-10 @ @ 1.1GHz
 - Linux   : Raspberry Buster, Cortex-A72 @ 1.5GHz
 - Android : Android 12, Pixel 5
-- Android : Android 6, Nexus 5
+- Android : Android 6, Nexus 5  But somewhat slow.
 - iOS     : not tested
 - Coral   : [Accelerator](https://coral.ai/products/accelerator) tested with Windows 11 , gave very approximately an order of magnitude speed up.
 
@@ -296,48 +296,140 @@ Android only, if available on device. Called by a tap gesture unless disabled
 
 ## Image analysis
 
-### Overview
+### Overview and Examples
 
-Implement video data analysis by creating a subclass of `Preview` and defining two methods. One to analyze the frame, the second to create and annotate the Preview image. In general like this:
+The programming pattern for video data analysis is to create a subclass of `Preview` and implement two predefined methods. One to analyze the frame, the second to create and annotate the Preview image. In general like this:
 
 ```python
 class CustomAnalyzer(Preview):
       def analyze_pixels_callback(self, pixels, size, image_pos, image_scale, mirror):
-	### Add your image analysis code here
+	### Add your pixels analysis code here
+	### 
 				
       def canvas_instructions_callback(self, texture, size, pos):
-	### Add your Preview annotation code here
+	### Add your Preview display code here
 
       # On Android this is an alternative to analyze_pixels_callback()
       def analyze_imageproxy_callback(self, image_proxy, image_pos, image_scale, mirror, degrees):
 	### Add your imageproxy specific analysis code here
 ```
 
-### Examples
+The `analyze_pixels_callback` is used to format the RGBA `pixels` having some `size`, and to execute some analysis code. The `pos`, `scale`, and `mirror` parameters enable mapping the analyzed pixels coordinates to Preview coordinates. The `mirror` parameter is required because `pixels` image is never mirrored, but the Preview may be. An example:
 
-Wondering what this pattern looks like in practice? Look at two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/edgedetect.py).
+```python
+ def analyze_pixels_callback(self, pixels, size, pos, scale, mirror):
+        pil_image = Image.frombytes(mode='RGBA', size=size, data= pixels)
+        barcodes = pyzbar.decode(pil_image, symbols=[ZBarSymbol.QRCODE])
+        found = []
+        for barcode in barcodes:
+            text = barcode.data.decode('utf-8')
+            if 'https://' in text or 'http://' in text:
+                x, y, w, h = barcode.rect
+                # Map Zbar coordinates to Kivy coordinates
+                y = size[1] -y -h
+                # Map Analysis coordinates to Preview coordinates
+                if mirror:
+                    x = size[0] -x -w
+                x = round(x * scale + pos[0])
+                y = round(y * scale + pos[1])
+                w = round(w * scale)
+                h = round(h * scale)
+                found.append({'x':x, 'y':y, 'w':w, 'h':h, 't':text})
+        self.make_thread_safe(list(found)) ## A COPY of the list
+```
 
-### Implementation Details
+Analysis and canvas annotation callbacks occur on different threads. The result of the analysis must be saved in a thread safe way, so that it is available for the canvas callback. We pass a **copy** of the result to:
 
-Image analysis must be enabled with a `connect_camera()` parameter, either `connect_camera(enable_analyze_pixels = True)` or `connect_camera(enable_analyze_imeageproxy = True)`
+```python
+    @mainthread
+    def make_thread_safe(self, found):
+        self.annotations = found
+```
 
-The `image_pos, image_scale, mirror` parameters enable mapping the analysis results coordinates to Preview coordinates. 
+An empty `canvas_instructions_callback()` will result in a white Preview. The method must at a minimum add an image, to add a normal Preview image and some annotation from the analysis above:
+
+```python
+  def canvas_instructions_callback(self, texture, size, pos):
+        # Add the preview image, a camera image with 'cropped resolution'. 
+        Color(1,1,1,1)
+        Rectangle(texture= texture, size = size, pos = pos)
+        # Add the annotations determinined during analyze callback.
+        Color(1,0,0,1)
+        for r in self.annotations:
+            Line(rectangle=(r['x'], r['y'], r['w'], r['h']), width = dp(2))	
+```
+
+Explictly adding the image enables alternatively displaying a different image, which might be an image transformed during the analyze callback. So change the Preview image in place of displaying the typical preview:
+
+```python
+  def canvas_instructions_callback(self, texture, size, pos):
+        # Add the preview image, a transformed camera image
+	# this has 'analyze_resolution'
+        if self.analyzed_texture:
+	    # 'self.analyzed_texture' contents created
+	    # by analyze_pixels_callback()
+            Color(1,1,1,1)
+            Rectangle(texture= self.analyzed_texture, size = size, pos = pos)
+```	   
+
+The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/edgedetect.py).
+
+But wait, there is more, a user can interact with the analysis results in teh Preview. The Preview subclass may have multiple inheritance, for example to allow the user to interact with annotations on the screen. The [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/qrreader.py) example illustrates this, in addition it inherits from a gestures package:
+
+```python
+    class QRReader(Preview, CommonGestures):
+```
+
+That package's gesture callbacks, and an annotation location test are used to initiate some action. In this case open a webbrowser based on a URL in a QR code, and a long press or mouse double click inside the box drawn around the QR code.
+
+```python
+    def cg_long_press(self, touch, x, y):
+        self.open_browser(x, y)
+
+    def cg_double_tap(self, touch, x, y):
+        self.open_browser(x, y)
+
+    def open_browser(self, x, y):
+        for r in self.annotations:
+            if x >= r['x'] and x <= r['x'] + r['w'] and\
+               y >= r['y'] and y <= r['y'] + r['h']:
+                webbrowser.open_new_tab(r['t'])
+```
+
+
+### Analysis Configuration
+
+Image analysis is enabled with a parameter to `connect_camera()`:
+
+`connect_camera(enable_analyze_pixels = True)`
+
+To change the default analysis resolution specify the number of pixels in the long edge (the default is the smaller of 1024 or the cropped resolution):
+
+`connect_camera(enable_analyze_pixels = True, analyze_resolution = 720)`
 
 The pixels api provides images with the same orientation and aspect ratio as the Preview.
 
-The imageproxy api provides images in landscape, regardless of the preview orientation. A degrees parameter enables adjusting the analysis accordingly.
+On Android only, the imageproxy api is an alternative to the pixels api. 
+
+`connect_camera(enable_analyze_imageproxy = True)`
+
+The imageproxy api provides images in landscape, regardless of the preview orientation. A degrees parameter enables adjusting the analysis accordingly. Android implements automatic changes to frame rate and resolution in the case of slow analysis. 
 
 ### Performance
 
-The camera provides a stream of images for analysis via the `analyze_pixels_callback()` callback. Images arrive at typically 30 fps, so the app has less than 30mS to do the analysis. The api has a fallback mechanism so that images are analyzed only when the previous analysis is complete. If the analysis results are 'jerky' it is because the analysis algorithm is too slow for the hardware.
+The camera provides a stream of images for analysis via `analyze_pixels_callback()`. Images arrive at typically 30 fps, so given some overhead the app has probably less than 30mS to do the analysis.
 
-The analysis code must be lean. So for example Keras is a development environment, a whole bunch of stuff you don't need to run an inference. Port the application to Tensorflow Lite.
+The api has a builtin mechanism so that images are analyzed only when the previous analysis is complete. This mechanism does not alter the canvas instructions frame rate. If the analysis results are 'jerky' it is because the analysis algorithm is slow for the hardware.
+
+One way to improve performance is to reduce the `analyze_resolution` as shown above. This option may alter the qualitative behavior, perhaps because of resolution bias in some third party analyzers. Experiment, some analysis code will work well at much less than VGA resolution. 
+
+The analysis code must be lean. So for example Keras is a complete development environment, a whole bunch of stuff you don't need to run an inference. Port the application to Tensorflow Lite, then use the tflite-runtime not the full Tensorflow Lite.
 
 ## Camera Behavior
 
 ### A Physical Camera
 
-A camera is a single physical device with a software api, it is not a software object though it can look like one. It is a physical object with physical constraints.
+A camera is a single physical device with a software api, it is not a software object though it can look like one. It is a physical object with physical constraints. 
 
 ### Resolution
 
