@@ -69,7 +69,7 @@ Also it requires `android.api = 30`   (or higher, min 29)
 
 `requirements = python3, kivy, camera4kivy, gestures4kivy`
 
-This hook enables all of the other camera specific options, and requires the the camera provider was added to the project.
+This hook enables all of the other camera specific options, and requires that the camera provider was added to the project.
 
 `p4a.hook = ./camerax_provider/gradle_options.py`
 
