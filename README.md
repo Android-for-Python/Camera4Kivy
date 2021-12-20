@@ -73,7 +73,7 @@ This hook enables all of the other camera specific options, and requires that th
 
 `p4a.hook = ./camerax_provider/gradle_options.py`
 
-The camerax gradle dependencies are architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
+The implementation of the camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
 
 #### Run Time Permissions
 
@@ -492,7 +492,7 @@ Some third party image viewers will incorrectly display a .jpg as rotated by 90 
 On Android, a `connect_camera()` called during `on_start()` will result in intermittent crashes during app start. The unfiltered logcat will contain: 'library "libdexfile.so" not found'.
 Use Kivy clock to schedule the `connect_camera()` one time step later.
 
-### Issue: Android armeabi-v7a build on an arm64-v8a device
+### Issue: Android armeabi-v7a build rn on an arm64-v8a device
 
-The camerax gradle dependencies are architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
+The implementation of the camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
 
