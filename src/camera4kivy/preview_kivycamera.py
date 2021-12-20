@@ -1,8 +1,10 @@
+from threading import Thread
 from kivy.utils import platform
 from kivy.core import core_select_lib
 from kivy.graphics import Rectangle, Color
 from kivy.graphics.texture import Texture
-from kivy.uix.label import Label
+from kivy.core.text import Label as CoreLabel
+from kivy.metrics import sp
 from camera4kivy.based_on_kivy_core.camera import Camera
 from camera4kivy.preview_common import PreviewCommon
 
@@ -12,6 +14,9 @@ class PreviewKivyCamera(PreviewCommon):
         super().__init__(**kwargs)
         self.error_message = ''
         self.mirror = True
+        self.switching_camera = False
+        self.starting_camera = False
+        self.abort_camera_start = False
         
     def __del__(self):
         self.disconnect_camera()
@@ -45,15 +50,23 @@ class PreviewKivyCamera(PreviewCommon):
         self.data_callback = analyze_callback
         self.canvas_callback = canvas_callback
         self.mirror = mirrored
-        self.start_camera()
+        self.stop_camera()
+        Thread(target=self.start_camera, daemon=True).start()
 
     def disconnect_camera(self):
-        self.stop_camera()
+        if self.starting_camera:
+            self.abort_camera_start = True
+        else:
+            self.stop_camera()
         
     def select_camera(self, index):
+        if self.switching_camera or self.starting_camera:
+            return self.index
+        self.switching_camera = True
         self.stop_camera()
         self.set_index(index)
         self.start_camera()
+        self.switching_camera = False
         return index
 
     def capture_screenshot(self, location = '.', subdir = '', name = ''):
@@ -123,6 +136,7 @@ class PreviewKivyCamera(PreviewCommon):
     #############################################
 
     def start_camera(self):
+        self.starting_camera = True
         try:
             if not self._sensor_resolution:
                 if platform in ['macosx', 'ios']:
@@ -157,6 +171,10 @@ class PreviewKivyCamera(PreviewCommon):
             self._camera.start()
             self._camera.bind(on_load=self.configure_texture_crop)
             self._camera.bind(on_texture=self.on_tex)
+        if self.abort_camera_start:
+            self.stop_camera()
+        self.abort_camera = False
+        self.starting_camera = False
 
     def camera_error(self):
         self.camera_error_message()
@@ -233,14 +251,15 @@ class PreviewKivyCamera(PreviewCommon):
 
 
     def canvas_text(self,text):
-        label = Label( text=text, size = self.view_size)
-        label.text_size = (None, None)
-        label.texture_update()
+        label = CoreLabel(font_size = sp(16))
+        label.text = text
+        label.refresh()        
         if label.texture:
-            pos = [(self.width-label.texture.size[0])/2,
-                   self.height/2]
+            pos = [self.view_pos[0] +\
+                   (self.view_size[0] - label.texture.size[0]) / 2,
+                   self.view_pos[1] + self.view_size[1] / 2]            
             with self.canvas:
-                Color(0.3,0.5,0.7,1)
+                Color(0.6,0.6,0.6,1)
                 Rectangle(size = self.view_size, pos = self.view_pos)
                 Color(1,0,0,1)
                 Rectangle(size=label.texture.size,

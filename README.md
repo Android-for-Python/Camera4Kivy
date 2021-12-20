@@ -3,11 +3,11 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
-This document has seven sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior), and [Known Issues](https://github.com/Android-for-Python/camera4kivy#known-issues).
+This document has these sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior),[Camera Provider](https://github.com/Android-for-Python/camera4kivy#camera-provider), and [Known Issues](https://github.com/Android-for-Python/camera4kivy#known-issues).
 
 ## Overview
 
-Available on all the usual platforms.
+Available on all the usual platforms except iOS.
 
 ```python
 from camera4kivy import Preview
@@ -51,58 +51,7 @@ On Android a pinch/spread gesture controls zoom, and a tap overrides any automat
 
 ## Install
 
-First install a camera provider if necessary. Then install Camera4Kivy.
-
-### Install a Camera Provider
-
-Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most platforms this uses the same provider as Kivy, with modified defaults.
-
-| Platform    | Provider      | Requires       |
-|-------------|---------------|----------------|
-| Windows     | [OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
-|             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
-| Macos       | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)| OSX >= 10.7    |   
-| Linux       | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
-|             | [OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
-| Rasberry    | [Picamera](https://github.com/Android-for-Python/camera4kivy#picamera)    | <= Buster      |
-|             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#picamera2)   | >= Bullseye    |
-|             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
-|             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
-| Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camerax_provider)                      |  Android >= 5.0 |
-| iOS         | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)                      |
-
-Like Kivy the first available provider is selected. Some camera provider specific behavior should be expected. For example a switch to a camera that does not exist will be ignored on MacOS and Rasberry Pi, but generate a screen message with OpenCV or GStreamer. Camera resolution defaults to the maximum available sensor resolution, except on Raspberry Pi where the default is (1024, 768).
-
-#### Android camerax_provider
-
-On the Buildozer host:
-
-`cd <project directory>`
-
-`git clone https://github.com/Android-for-Python/camerax_provider.git`
-
-`rm -rf camerax_provider/.git`
-
-#### OpenCV
-
-`pip3 install opencv-python`
-
-#### GStreamer
-
-Depends on the Linux flavor, but commonly:
-
-`sudo apt-get install gstreamer-1.0`
-
-`sudo apt-get install gstreamer1.0-dev`
-
-#### Picamera
-Pre-installed
-
-#### Picamera2
-[Not available](https://www.raspberrypi.com/news/bullseye-camera-system/)
-
-#### AVFoundation
-Pre-installed
+A [camera provider](https://github.com/Android-for-Python/camera4kivy#camera-provider) may be required. On a destop the camera provider is installed once. On Android the camera provider is [added to each project](https://github.com/Android-for-Python/camera4kivy#android-camera-provider).
 
 ### Install Camera4Kivy on Desktop
 
@@ -114,17 +63,13 @@ Camera4Kivy depends on the 'master' version of Buildozer. Currently `1.2.0.dev0`
 
 `pip3 install git+https://github.com/kivy/buildozer.git`
 
+Also it requires `android.api = 30`   (or higher, min 29)
+
 #### buildozer.spec:
 
-`requirements = python3, kivy, camera4kivy`
+`requirements = python3, kivy, camera4kivy, gestures4kivy`
 
-`android.permissions =  CAMERA, RECORD_AUDIO`    
-
-`android.api = 30`   (or higher, min 29)
-
-These two enable the camera provider:
-
-`p4a.local_recipes =  ./camerax_provider/recipes`  
+This hook enables all of the other camera specific options, and requires the the camera provider was added to the project.
 
 `p4a.hook = ./camerax_provider/gradle_options.py`
 
@@ -465,7 +410,57 @@ The `analyze_imageproxy_callback()` implements a graceful degradation mechanism.
 
 #### Display Resolution.
 
-Nothing to do with a camera, it is a physical property of a screen. A scalar measured in dpi. 
+Nothing to do with a camera, it is a physical property of a screen. A scalar measured in dpi.
+
+
+## Camera Provider
+
+Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most platforms this uses the same provider as Kivy, with modified defaults.
+
+| Platform    | Provider      | Requires       |
+|-------------|---------------|----------------|
+| Windows     | [OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
+|             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
+| Macos       | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)| OSX >= 10.7    |   
+| Linux       | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
+|             | [OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
+| Rasberry    | [Picamera](https://github.com/Android-for-Python/camera4kivy#picamera)    | <= Buster      |
+|             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#picamera2)   | >= Bullseye    |
+|             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
+|             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
+| Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camerax_provider)                      |  Android >= 5.0 |
+| iOS         | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)                      |
+
+Like Kivy, the first available provider is selected. Some camera provider specific behavior should be expected. For example a switch to a camera that does not exist will be ignored on MacOS and Rasberry Pi, but generate a screen message with OpenCV or GStreamer. Camera resolution defaults to the maximum available sensor resolution, except on Raspberry Pi where the default is (1024, 768).
+
+### Android Camera Provider
+
+`cd <project directory>`
+
+`git clone https://github.com/Android-for-Python/camerax_provider.git`
+
+`rm -rf camerax_provider/.git`
+
+### OpenCV
+
+`pip3 install opencv-python`
+
+### GStreamer
+
+Depends on the Linux flavor, but commonly:
+
+`sudo apt-get install gstreamer-1.0`
+
+`sudo apt-get install gstreamer1.0-dev`
+
+### Picamera
+Pre-installed
+
+### Picamera2
+[Not available](https://www.raspberrypi.com/news/bullseye-camera-system/)
+
+### AVFoundation
+Pre-installed
 
 
 ## Known Issues
