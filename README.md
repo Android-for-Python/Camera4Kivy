@@ -69,7 +69,7 @@ Also it requires `android.api = 30`   (or higher, min 29)
 
 `requirements = python3, kivy, camera4kivy, gestures4kivy`
 
-This hook enables all of the other camera specific options, and requires that the camera provider was added to the project.
+Set `p4a.hook` to enable the app's use of the [camera provider](https://github.com/Android-for-Python/camera4kivy#android-camera-provider). This sets the required p4a options.
 
 `p4a.hook = ./camerax_provider/gradle_options.py`
 
@@ -106,8 +106,8 @@ On Android `orientation = all` is available, on the desktop you can change the w
 - Windows : Windows 11, i7-10 @ 1.1GHz
 - Macos   : Big Sur,  i5-10 @ @ 1.1GHz
 - Linux   : Raspberry Buster, Cortex-A72 @ 1.5GHz
-- Android : Android 12, Pixel 5
-- Android : Android 6, Nexus 5  But somewhat slow.
+- Android : build : arm64-v8a  device: Android 12, Pixel 5
+- Android : build : armeabi-v7a device: Android 6, Nexus 5  Start is somewhat slow.
 - iOS     : not tested
 - Coral   : [Accelerator](https://coral.ai/products/accelerator) tested with Windows 11 , gave very approximately an order of magnitude speed up.
 
@@ -319,9 +319,9 @@ Explictly adding the image enables alternatively displaying a different image, w
             Rectangle(texture= self.analyzed_texture, size = size, pos = pos)
 ```	   
 
-The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/edgedetect.py).
+The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/blob/main/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/blob/main/edgedetect.py).
 
-But wait, there is more, a user can interact with the analysis results in teh Preview. The Preview subclass may have multiple inheritance, for example to allow the user to interact with annotations on the screen. The [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/qrreader.py) example illustrates this, in addition it inherits from a gestures package:
+But wait, there is more, a user can interact with the analysis results in teh Preview. The Preview subclass may have multiple inheritance, for example to allow the user to interact with annotations on the screen. The QR Reader example illustrates this, by inheriting from a gestures package:
 
 ```python
     class QRReader(Preview, CommonGestures):
@@ -430,7 +430,7 @@ Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most 
 |             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#picamera2)   | >= Bullseye    |
 |             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
 |             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
-| Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camerax_provider)                      |  Android >= 5.0 |
+| Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camera-provider)                      |  Android >= 5.0 |
 | iOS         | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)                      |
 
 Like Kivy, the first available provider is selected. Some camera provider specific behavior should be expected. For example a switch to a camera that does not exist will be ignored on MacOS and Rasberry Pi, but generate a screen message with OpenCV or GStreamer. Camera resolution defaults to the maximum available sensor resolution, except on Raspberry Pi where the default is (1024, 768).
@@ -442,6 +442,10 @@ Like Kivy, the first available provider is selected. Some camera provider specif
 `git clone https://github.com/Android-for-Python/camerax_provider.git`
 
 `rm -rf camerax_provider/.git`
+
+Set `p4a.hook` to enable the app's use of the camera provider.
+
+`p4a.hook = camerax_provider/gradle_options.py`
 
 ### OpenCV
 
@@ -469,11 +473,11 @@ Pre-installed
 
 ### Issue: iOS implementation is not tested.
 
-It probably don't work, kick back and wait a while.
+It probably will have issues, don't expect it to work.
 
 ### Issue: Raspberry PI video frame rate is lower than other platforms.
 
-Functional, but low. The issue is probably either in the picamera package and the way it is used. Perhaps [Picamera2](https://www.raspberrypi.com/news/bullseye-camera-system/) which is in development will address this.  
+Functional, but with a low frame rate. The issue is probably related to the current picamera implementation, try Gstreamer or OpenCV.
 
 ### Issue: Android Rotation
 
@@ -492,7 +496,11 @@ Some third party image viewers will incorrectly display a .jpg as rotated by 90 
 On Android, a `connect_camera()` called during `on_start()` will result in intermittent crashes during app start. The unfiltered logcat will contain: 'library "libdexfile.so" not found'.
 Use Kivy clock to schedule the `connect_camera()` one time step later.
 
-### Issue: Android armeabi-v7a build rn on an arm64-v8a device
+### Issue: Android switching cameras, short duration inverted image.
 
-The implementation of the camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
+When switching cameras there may be a short duration inverted image, this is more likely on older Android devices.
+
+### Issue: Android armeabi-v7a build installed on an arm64-v8a device
+
+The implementation of Google's camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
 
