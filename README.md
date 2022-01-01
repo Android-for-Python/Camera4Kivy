@@ -3,7 +3,9 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
-This document has these sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior),[Camera Provider](https://github.com/Android-for-Python/camera4kivy#camera-provider), and [Known Issues](https://github.com/Android-for-Python/camera4kivy#known-issues).
+This document has these sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior), [Camera Provider](https://github.com/Android-for-Python/camera4kivy#camera-provider), and [Known Behavior](https://github.com/Android-for-Python/camera4kivy#known-behaviors).
+
+Android users, there is a [build architecture restriction](behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device). 
 
 ## Overview
 
@@ -71,7 +73,7 @@ Also it requires `android.api = 30`   (or higher, min 29)
 
 Set `p4a.hook` to enable the app's use of the [camera provider](https://github.com/Android-for-Python/camera4kivy#android-camera-provider). This sets the required p4a options.
 
-`p4a.hook = ./camerax_provider/gradle_options.py`
+`p4a.hook = camerax_provider/gradle_options.py`
 
 The implementation of the camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
 
@@ -149,6 +151,8 @@ A string property. One of 'portrait' , 'landscape', 'same', 'opposite'.  The def
 The widget has these methods:
 
 #### Connect Camera 
+
+This may only be called after `on_start()`.
 
 ```python
     def connect_camera(self,kwargs):
@@ -469,38 +473,42 @@ Pre-installed
 Pre-installed
 
 
-## Known Issues
+## Known Behavior
 
-### Issue: iOS implementation is not tested.
+### Behavior: Preview has no aspect_ratio = 'fit'
+
+There is no way to specify inverted letterboxing. Where the Preview exactly fits the space available, resulting in one axis of the captured image being partially shown to the user.
+
+### Behavior: iOS implementation is not tested.
 
 It probably will have issues, don't expect it to work.
 
-### Issue: Raspberry PI video frame rate is lower than other platforms.
+### Behavior: Raspberry PI video frame rate is lower than other platforms.
 
 Functional, but with a low frame rate. The issue is probably related to the current picamera implementation, try Gstreamer or OpenCV.
 
-### Issue: Android Rotation
+### Behavior: Android Rotation
 
 Rotating the physical device through 'inverted portrait' may result in an 'inverted landscape' display. An additional rotation to 'portrait' and back to 'landscape' corrects the display. 
 
-### Issue: Android .mp4 Orientation
+### Behavior: Android .mp4 Orientation
 
 Video file orientation is incorrect if the preview orientation is not the same as the device orientation. Do not use this layout configuration when recording video. [Google issue tracker](https://issuetracker.google.com/issues/201085351).
 
-### Issue: Android .jpg Orientation.
+### Behavior: Android .jpg Orientation.
 
 Some third party image viewers will incorrectly display a .jpg as rotated by 90 degrees. This occurs if the capture preview orientation is not the same as the device orientation, and the third party viewer does not use the Exif metadata.   
 
-### Issue: Android connect_camera during on_start()
+### Behavior: Android connect_camera during on_start()
 
 On Android, a `connect_camera()` called during `on_start()` will result in intermittent crashes during app start. The unfiltered logcat will contain: 'library "libdexfile.so" not found'.
 Use Kivy clock to schedule the `connect_camera()` one time step later.
 
-### Issue: Android switching cameras, short duration inverted image.
+### Behavior: Android switching cameras, short duration inverted image.
 
 When switching cameras there may be a short duration inverted image, this is more likely on older Android devices.
 
-### Issue: Android armeabi-v7a build installed on an arm64-v8a device
+### Behavior: Android armeabi-v7a build installed on an arm64-v8a device
 
-The implementation of Google's camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
+The implementation of Google's camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device. To rin on an arm64-v8a device you **must** build for arm64-v8a.
 
