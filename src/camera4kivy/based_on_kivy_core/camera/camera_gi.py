@@ -61,7 +61,6 @@ class CameraGi(CameraBase):
         self._texturesize = None
         self._callback = None
         self._video_src = kwargs.get('video_src', 'v4l2src')
-        #self._aspect = kwargs.get('aspect_ratio')
         self._callback = kwargs.get('callback')        
         wk = ref(self, _on_cameragi_unref)
         CameraGi._instances.append(wk)
@@ -78,11 +77,6 @@ class CameraGi(CameraBase):
             video_src += ' device=/dev/video%d' % self._index
         elif video_src == 'dc1394src':
             video_src += ' camera-number=%d' % self._index
-
-        #if self._aspect == '16:9' :
-        #    aspect = '! aspectratiocrop aspect-ratio=16/9'
-        #else:
-        #    aspect = ''            
 
         if Gst.version() < (1, 0, 0, 0):
             caps = ('video/x-raw-rgb,red_mask=(int)0xff0000,'
@@ -118,14 +112,7 @@ class CameraGi(CameraBase):
 
     def on_state_changed(self, bus, msg):
         # Seems to be more responsive if we listen for this!
-        if not msg.src == self._pipeline:
-            # not from the pipeline,ignore
-            return
-        '''
-        old, new, pending = msg.parse_state_changed()
-        print("State changed from {0} to {1}".format(
-            Gst.Element.state_get_name(old), Gst.Element.state_get_name(new)))
-        '''            
+        pass
 
     def _gst_new_sample(self, *largs):
         sample = self._camerasink.emit('pull-sample')

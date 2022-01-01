@@ -139,6 +139,8 @@ class PreviewKivyCamera(PreviewCommon):
         self.starting_camera = True
         try:
             if not self._sensor_resolution:
+                # a max resolution will fall back to the highest available
+                # except picamera
                 if platform in ['macosx', 'ios']:
                     # default 16:9
                     self._sensor_resolution = [3840, 2160]
@@ -152,7 +154,6 @@ class PreviewKivyCamera(PreviewCommon):
                     pass
             self._camera = Camera(index= self.index,
                                   resolution = self._sensor_resolution,
-                                  aspect_ratio = self.aspect_ratio,
                                   callback = self.camera_error)
             self.error_message = ""
         except AttributeError:
