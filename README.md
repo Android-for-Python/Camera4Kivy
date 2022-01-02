@@ -119,7 +119,7 @@ Illustrates basic layout using screens. Basic camera functionality including pho
 On Raspberry PI a mouse must be used, a touch pad does not work correctly.
 
 ### [C4K-QR-Example](https://github.com/Android-for-Python/c4k_qr_example)
-Everything you need to read a restaurant menu. Long press or double click on a highlighted QR code to open a webrowser. Illustrates basic analysis, screen annotation, and user interaction. 
+Everything you need to read a restaurant menu. Long press or double click on a highlighted QR code to open a web browser. Illustrates basic analysis, screen annotation, and user interaction. 
 
 ### [C4K-OpenCV-Example.](https://github.com/Android-for-Python/c4k_opencv_example)
 Edge detect the video stream. Illustrates using OpenCV analysis and replacing the original preview with the transformed image.
@@ -332,7 +332,7 @@ But wait, there is more, a user can interact with the analysis results in the Pr
     class QRReader(Preview, CommonGestures):
 ```
 
-That package's gesture callbacks, and an annotation location test are used to initiate some action. In this case open a webbrowser based on a URL in a QR code, and a long press or mouse double click inside the box drawn around the QR code.
+That package's gesture callbacks, and an annotation location test are used to initiate some action. In this case open a web browser based on a URL in a QR code, and a long press or mouse double click inside the box drawn around the QR code.
 
 ```python
     def cg_long_press(self, touch, x, y):
