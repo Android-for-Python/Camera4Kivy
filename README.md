@@ -499,7 +499,7 @@ Functional, but with a low frame rate. The issue is probably related to the curr
 
 ### Behavior: Raspberry PI Bullseye not available
 
-The RaspberryPI video stack changed with Bullseye. In Bullseye currently the only working camera source is `libcamera`. Picamera is not availible, [apparently]((https://www.raspberrypi.com/news/bullseye-camera-system/) a RPI Picamera2 Python interface is in development. And `libcamera` is not compatible with OpenCV or Kivy's GStreamer implementation. 
+The RaspberryPI video stack changed with Bullseye. In Bullseye currently the only working camera source is `libcamera`. Picamera is not availible, [apparently](https://www.raspberrypi.com/news/bullseye-camera-system/) a RPI Picamera2 Python interface is in development. And `libcamera` is not compatible with OpenCV or Kivy's GStreamer implementation. 
 
 ### Behavior: Android Rotation
 
