@@ -326,7 +326,7 @@ Explictly adding the image enables alternatively displaying a different image, w
 
 The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/blob/main/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/blob/main/edgedetect.py).
 
-But wait, there is more, a user can interact with the analysis results in teh Preview. The Preview subclass may have multiple inheritance, for example to allow the user to interact with annotations on the screen. The QR Reader example illustrates this, by inheriting from a gestures package:
+But wait, there is more, a user can interact with the analysis results in the Preview. The Preview subclass may have multiple inheritance, for example to allow the user to interact with annotations on the screen. The QR Reader example illustrates this, by inheriting from a gestures package:
 
 ```python
     class QRReader(Preview, CommonGestures):
