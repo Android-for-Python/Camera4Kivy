@@ -6,6 +6,11 @@ Implement CameraBase with Gi / Gstreamer, working on both Python 2 and 3
 '''
 
 __all__ = ('CameraGi', )
+try:
+    from gi import require_version 
+    require_version('Gst', '1.0') 
+except:
+    pass
 
 from gi.repository import Gst
 from kivy.clock import Clock
