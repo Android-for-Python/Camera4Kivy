@@ -105,9 +105,10 @@ On Android `orientation = all` is available, on the desktop you can change the w
 | MLKit | | | | :heavy_check_mark: | | |
 | TFLite   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | :heavy_check_mark: |
 
-- Windows : Windows 11, i7-10 @ 1.1GHz
-- Macos   : Big Sur,  i5-10 @ @ 1.1GHz
-- Linux   : Raspberry Buster, Cortex-A72 @ 1.5GHz
+- Windows : Windows 11, i7-10 @ 1.1GHz, Python 3.8.2  Kivy==2.1.0.dev0
+- Windows : Windows 10, i3-7 @ 2.4GHz, Python 3.9.7 Kivy==2.0.0
+- Macos   : Big Sur,  i5-10 @ @ 1.1GHz, Python 3.9.9 Kivy==2.0.0
+- Linux   : Raspberry Buster, Cortex-A72 @ 1.5GHz Python3.7.3 Kivy==2.0.0
 - Android : build : arm64-v8a  device: Android 12, Pixel 5
 - Android : build : armeabi-v7a device: Android 6, Nexus 5  Start is somewhat slow.
 - iOS     : not tested
@@ -431,13 +432,22 @@ Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most 
 | Linux       | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
 |             | [OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
 | Rasberry    | [Picamera](https://github.com/Android-for-Python/camera4kivy#picamera)    | <= Buster      |
-|             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#picamera2)   | >= Bullseye    |
-|             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
-|             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
+|             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)  |  <= Buster |
+|             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv) |  <= Buster  |
+|             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#picamera2)    | >= Bullseye      |
 | Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camera-provider)                      |  Android >= 5.0 |
 | iOS         | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)                      |
 
 Like Kivy, the first available provider is selected. Some camera provider specific behavior should be expected. For example a switch to a camera that does not exist will be ignored on MacOS and Rasberry Pi, but generate a screen message with OpenCV or GStreamer. Camera resolution defaults to the maximum available sensor resolution, except on Raspberry Pi where the default is (1024, 768).
+
+You can remove a camera provider ('picamer' in the example below) from the above lists by inserting this code before `from kivy.app import App`.
+
+```python
+from kivy import kivy_options
+providers= list(kivy_options['camera'])
+providers.remove('picamera')
+kivy_options['camera'] = tuple(providers)
+```
 
 ### Android Camera Provider
 
@@ -467,7 +477,7 @@ Depends on the Linux flavor, but commonly:
 Pre-installed
 
 ### Picamera2
-[Not available](https://www.raspberrypi.com/news/bullseye-camera-system/)
+[Raspberry PI Bullseye not available](https://github.com/Android-for-Python/camera4kivy#behavior--raspberry-pi-bullseye-not-available).
 
 ### AVFoundation
 Pre-installed
@@ -486,6 +496,10 @@ It probably will have issues, don't expect it to work.
 ### Behavior: Raspberry PI video frame rate is lower than other platforms.
 
 Functional, but with a low frame rate. The issue is probably related to the current picamera implementation, try Gstreamer or OpenCV.
+
+### Behavior: Raspberry PI Bullseye not available
+
+The RaspberryPI video stack changed with Bullseye. In Bullseye currently the only working camera source is `libcamera`. Picamera is not availible, [apparently]((https://www.raspberrypi.com/news/bullseye-camera-system/)) a RPI Picamera2 Python interface is in development. And `libcamera` is not compatible with OpenCV or Kivy's GStreamer implementation. 
 
 ### Behavior: Android Rotation
 
