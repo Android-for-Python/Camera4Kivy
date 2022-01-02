@@ -440,7 +440,7 @@ Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most 
 
 Like Kivy, the first available provider is selected. Some camera provider specific behavior should be expected. For example a switch to a camera that does not exist will be ignored on MacOS and Rasberry Pi, but generate a screen message with OpenCV or GStreamer. Camera resolution defaults to the maximum available sensor resolution, except on Raspberry Pi where the default is (1024, 768).
 
-You can remove a camera provider ('picamer' in the example below) from the above lists by inserting this code before `from kivy.app import App`.
+You can remove a camera provider ('picamera' in the example below) from the above lists by inserting this code **before** `from kivy.app import App`.
 
 ```python
 from kivy import kivy_options
@@ -477,7 +477,7 @@ Depends on the Linux flavor, but commonly:
 Pre-installed
 
 ### Picamera2
-[Raspberry PI Bullseye not available](https://github.com/Android-for-Python/camera4kivy#behavior--raspberry-pi-bullseye-not-available).
+[Raspberry PI Bullseye not available](https://github.com/Android-for-Python/camera4kivy#behavior-raspberry-pi-bullseye-not-available).
 
 ### AVFoundation
 Pre-installed
@@ -499,7 +499,7 @@ Functional, but with a low frame rate. The issue is probably related to the curr
 
 ### Behavior: Raspberry PI Bullseye not available
 
-The RaspberryPI video stack changed with Bullseye. In Bullseye currently the only working camera source is `libcamera`. Picamera is not availible, [apparently]((https://www.raspberrypi.com/news/bullseye-camera-system/)) a RPI Picamera2 Python interface is in development. And `libcamera` is not compatible with OpenCV or Kivy's GStreamer implementation. 
+The RaspberryPI video stack changed with Bullseye. In Bullseye currently the only working camera source is `libcamera`. Picamera is not availible, [apparently]((https://www.raspberrypi.com/news/bullseye-camera-system/) a RPI Picamera2 Python interface is in development. And `libcamera` is not compatible with OpenCV or Kivy's GStreamer implementation. 
 
 ### Behavior: Android Rotation
 
