@@ -31,7 +31,7 @@ In Python
     self.preview = Preview(aspect_ratio = '16:9')
 ```
 
-To connect the camera unit to the Preview call the preview's `connect_camera()` method. For example to connect the camera with the image analysis api enabled:
+To connect the camera unit to the Preview call the preview's `connect_camera()` method, **after on_start()**. For example to connect the camera with the image analysis api enabled :
 
 ```python
     self.preview.connect_camera(enable_analyze_pixels = True)
