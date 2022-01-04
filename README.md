@@ -5,7 +5,9 @@ Camera4Kivy
 
 This document has these sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior), [Camera Provider](https://github.com/Android-for-Python/camera4kivy#camera-provider), and [Known Behavior](https://github.com/Android-for-Python/camera4kivy#known-behaviors).
 
-Android users, there is a [build architecture restriction](behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device). 
+Android users:
+- there is a [build/run architecture restriction](behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device).
+- Do not [build with 'kivy==master'](behavior-android-kivy--master-black-screen)
 
 ## Overview
 
@@ -525,4 +527,9 @@ When switching cameras there may be a short duration inverted image, this is mor
 ### Behavior: Android armeabi-v7a build installed on an arm64-v8a device
 
 The implementation of Google's camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device. To rin on an arm64-v8a device you **must** build for arm64-v8a.
+
+### Behavior: Android 'kivy==master' black screen
+
+Logcat message "TypeError: Cannot create graphics instruction outside the main Kivy thread". 'Kivy==master' [issue](https://github.com/kivy/kivy/issues/7733), workaround use 'kivy==2.0.0'.
+
 
