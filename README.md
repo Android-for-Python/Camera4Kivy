@@ -6,8 +6,8 @@ Camera4Kivy
 This document has these sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior), [Camera Provider](https://github.com/Android-for-Python/camera4kivy#camera-provider), and [Known Behavior](https://github.com/Android-for-Python/camera4kivy#known-behaviors).
 
 Android users:
-- there is a [build/run architecture restriction](behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device).
-- Do not [build with 'kivy==master'](behavior-android-kivy--master-black-screen)
+- there is a [build/run architecture restriction](#behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device).
+- Do not [build with 'kivy==master'](#behavior-android-kivymaster-black-screen)
 
 ## Overview
 
