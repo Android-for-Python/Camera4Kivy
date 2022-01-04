@@ -530,6 +530,8 @@ The implementation of Google's camerax gradle dependencies is architecture speci
 
 ### Behavior: Android 'kivy==master' black screen
 
-Logcat message "TypeError: Cannot create graphics instruction outside the main Kivy thread". 'Kivy==master' [issue](https://github.com/kivy/kivy/issues/7733), workaround use 'kivy==2.0.0'.
+Logcat message:
+"TypeError: Cannot create graphics instruction outside the main Kivy thread".
+This is a 'Kivy==master' [issue](https://github.com/kivy/kivy/issues/7733), workaround use 'kivy==2.0.0'.
 
 
