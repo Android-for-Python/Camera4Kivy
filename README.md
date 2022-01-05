@@ -367,7 +367,13 @@ On Android only, the imageproxy api is an alternative to the pixels api.
 
 `connect_camera(enable_analyze_imageproxy = True)`
 
-The imageproxy api provides images in landscape, regardless of the preview orientation. A degrees parameter enables adjusting the analysis accordingly. Android implements automatic changes to frame rate and resolution in the case of slow analysis. 
+The imageproxy api provides images in landscape, regardless of the preview orientation. A degrees parameter enables adjusting the analysis accordingly. Android implements automatic changes to frame rate and resolution in the case of slow analysis.
+
+### Debugging
+
+Check that the app analysis code is doing what you expect. If the result of this is coordinates (most cases) then check these with a print statement. Move whatever you expect to be detected to the four corners of the camera view. Look the printed values, do they reflect the analysed image pixels size and orientation? Repeat for the coordinates after they are mapped to a Kivy widget.
+
+Measure the time the analysis algorithm takes to execute on one frame. Do this in the cases of detection and nothing to detect. This along with some overhead will define the maximum analysis frame rate. The [tflite example](https://github.com/Android-for-Python/c4k_tflite_example/blob/main/classifyobject.py) monitors analysis frame rate as part of its normal operation.
 
 ### Performance
 
