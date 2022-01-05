@@ -318,7 +318,7 @@ Explictly adding the image enables alternatively displaying a different image, w
 ```python
   def canvas_instructions_callback(self, texture, size, pos):
         # Add the preview image, a transformed camera image
-	# this has 'analyze_resolution'
+	# this has 'analyze_pixels_resolution'
         if self.analyzed_texture:
 	    # 'self.analyzed_texture' contents created
 	    # by analyze_pixels_callback()
@@ -359,7 +359,7 @@ Image analysis is enabled with a parameter to `connect_camera()`:
 
 To change the default analysis resolution specify the number of pixels in the long edge (the default is the smaller of 1024 or the cropped resolution):
 
-`connect_camera(enable_analyze_pixels = True, analyze_resolution = 720)`
+`connect_camera(enable_analyze_pixels = True, analyze_pixels_resolution = 720)`
 
 The pixels api provides images with the same orientation and aspect ratio as the Preview.
 
@@ -375,7 +375,7 @@ The camera provides a stream of images for analysis via `analyze_pixels_callback
 
 The api has a builtin mechanism so that images are analyzed only when the previous analysis is complete. This mechanism does not alter the canvas instructions frame rate. If the analysis results are 'jerky' it is because the analysis algorithm is slow for the hardware.
 
-One way to improve performance is to reduce the `analyze_resolution` as shown above. This option may alter the qualitative behavior, perhaps because of resolution bias in some third party analyzers. Experiment, some analysis code will work well at much less than VGA resolution. 
+One way to improve performance is to reduce the `analyze_pixels_resolution` as shown above. This option may alter the qualitative behavior, perhaps because of resolution bias in some third party analyzers. Experiment, some analysis code will work well at much less than VGA resolution. 
 
 The analysis code must be lean. So for example Keras is a complete development environment, a whole bunch of stuff you don't need to run an inference. Port the application to Tensorflow Lite, then use the tflite-runtime not the full Tensorflow Lite.
 
