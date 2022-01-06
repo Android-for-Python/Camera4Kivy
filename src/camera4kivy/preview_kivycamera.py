@@ -27,6 +27,8 @@ class PreviewKivyCamera(PreviewCommon):
         self.canvas.clear()
         if self.error_message:
             self.canvas_text(self.error_message)
+        elif self._camera:
+            self.on_tex(None)
         else:
             with self.canvas:
                 Color(1,1,1,1)
