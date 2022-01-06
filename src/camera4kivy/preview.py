@@ -155,7 +155,8 @@ class Preview(AnchorLayout):
                              round(texture.size[1]/fbo_scale))
                 fbo_pos = (0, 0)
             origin    = (round(fbo_size[0]/2), round(fbo_size[1]/2))
-            if not self._fbo:
+            # new or resized texture
+            if not self._fbo or self._fbo.size[0] != fbo_size[0]:
                 self._fbo = Fbo(size = fbo_size)
             self._fbo.clear()
             with self._fbo:
