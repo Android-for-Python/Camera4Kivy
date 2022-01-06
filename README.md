@@ -67,9 +67,10 @@ Camera4Kivy depends on the 'master' version of Buildozer. Currently `1.2.0.dev0`
 
 `pip3 install git+https://github.com/kivy/buildozer.git`
 
-Also it requires `android.api = 30`   (or higher, min 29)
 
 #### buildozer.spec:
+
+`android.api = 30`   (or higher, min 29)
 
 `requirements = python3, kivy, camera4kivy, gestures4kivy`
 
