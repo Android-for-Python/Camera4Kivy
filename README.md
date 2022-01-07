@@ -320,7 +320,7 @@ We can also replace the existing Preview image with some other image. For exampl
 
 ```python
     def canvas_instructions_callback(self, texture, size, pos):
-        # Add the preview image, which is a transformed camera image
+        # Add a different preview image, which is a transformed camera image
 	# this image has 'analyze_pixels_resolution'
         if self.analyzed_texture:
 	    # 'self.analyzed_texture' contents created
