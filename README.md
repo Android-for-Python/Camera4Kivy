@@ -259,7 +259,7 @@ The programming pattern for video data analysis is to create a subclass of `Prev
 class CustomAnalyzer(Preview):
       def analyze_pixels_callback(self, pixels, size, image_pos, image_scale, mirror):
 	### Add your pixels analysis code here
-	### 
+	### Add your coordinate transforms here
 				
       def canvas_instructions_callback(self, texture, size, pos):
 	### Add your Preview display code here
@@ -269,7 +269,9 @@ class CustomAnalyzer(Preview):
 	### Add your imageproxy specific analysis code here
 ```
 
-The `analyze_pixels_callback` is used to format the RGBA `pixels` having some `size`, and to execute some analysis code. The `pos`, `scale`, and `mirror` parameters enable mapping the analyzed pixels coordinates to Preview coordinates. The `mirror` parameter is required because `pixels` image is never mirrored, but the Preview may be. An example:
+Keep to this pattern. Perform analysis and coordinate transforms in the 'analyze_pixel_callback' (or imageproxy) method. And in 'canvas_instructions_callback' only display the results of previous calculations. Data passed from analysis method to display method must be passed in a thread safe way, for example as shown in the second code fragment below.
+
+The `analyze_pixels_callback` method is used to analyze its RGBA `pixels` and `size` arguments. The `pos`, `scale`, and `mirror` parameters enable mapping the analyzed pixels coordinates to Preview coordinates. The `mirror` parameter is required because `pixels` image is never mirrored, but the Preview may be. An example:
 
 ```python
  def analyze_pixels_callback(self, pixels, size, pos, scale, mirror):
@@ -327,7 +329,7 @@ Explictly adding the image enables alternatively displaying a different image, w
             Rectangle(texture= self.analyzed_texture, size = size, pos = pos)
 ```	   
 
-The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/blob/main/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/blob/main/edgedetect.py).
+The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/blob/main/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/blob/main/edgedetect.py). Similar examples exhibiting this pattern are [tflite](https://github.com/Android-for-Python/c4k_tflite_example/blob/main/classifyobject.py) and [mlkit](https://github.com/Android-for-Python/c4k_mlkit_example/blob/main/facedetect.py).
 
 But wait, there is more, a user can interact with the analysis results in the Preview. The Preview subclass may have multiple inheritance, for example to allow the user to interact with annotations on the screen. The QR Reader example illustrates this, by inheriting from a gestures package:
 
