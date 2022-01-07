@@ -263,8 +263,10 @@ class CustomAnalyzer(Preview):
 				
       def canvas_instructions_callback(self, texture, size, pos):
 	### Add your Preview display code here
+```
 
-      # On Android this is an alternative to analyze_pixels_callback()
+On Android this is an alternative to analyze_pixels_callback(), it is used for Android only analysis packages.
+```
       def analyze_imageproxy_callback(self, image_proxy, image_pos, image_scale, mirror, degrees):
 	### Add your imageproxy specific analysis code here
 ```
