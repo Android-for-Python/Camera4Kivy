@@ -142,12 +142,6 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
         if self._camera:
             self._camera.setViewPort(self.view_size)
             self._camera.startCamera()
-            '''
-            if start:
-                self._camera.startCamera()
-            else:
-                self._camera.configureCameraMainThread()
-            '''
         else:
             self.canvas.clear()
             with self.canvas:
