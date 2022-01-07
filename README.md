@@ -269,7 +269,7 @@ class CustomAnalyzer(Preview):
 	### Add your imageproxy specific analysis code here
 ```
 
-Keep to this pattern. Perform analysis and coordinate transforms in the 'analyze_pixel_callback' (or imageproxy) method. And in 'canvas_instructions_callback' only display the results of previous calculations. Data passed from analysis method to display method must be passed in a thread safe way, for example as shown in the second code fragment below.
+Keep to this pattern. Perform analysis and coordinate transforms in the 'analyze_pixel_callback' (or imageproxy) method. And in 'canvas_instructions_callback' only display the results of previous calculations. Data passed from the analysis method to the display method must be passed in a thread safe way, for example as shown in the second code fragment below.
 
 The `analyze_pixels_callback` method is used to analyze its RGBA `pixels` and `size` arguments. The `pos`, `scale`, and `mirror` parameters enable mapping the analyzed pixels coordinates to Preview coordinates. The `mirror` parameter is required because `pixels` image is never mirrored, but the Preview may be. An example:
 
