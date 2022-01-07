@@ -398,8 +398,8 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
     def _set_surface_provider(self, enable):
         self._camera.setSurfaceProvider(enable)
 
-    # Run on UI thread because required by Kivy canvas
-    @run_on_ui_thread
+    # Run on mainthread because required by Kivy canvas
+    @mainthread
     def _update_canvas(self):
         tex = self._fbo.texture.get_region(*self.crop)
         self.canvas.clear()
