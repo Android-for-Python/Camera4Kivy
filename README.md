@@ -167,7 +167,7 @@ Optional arguments:
 ##### camera_id
 Specify which camera to connect to. For example `camera_id = 'front'`. A string containing an integer (default '0'), or on Android 'back' (default), or 'front'.
 
-##### mirror
+##### mirrored
 Boolean default True. Mirrors the preview image. Ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored.
 
 ##### filepath_callback
@@ -261,7 +261,7 @@ class CustomAnalyzer(Preview):
 	### Add your pixels analysis code here
 	### Add your coordinate transforms here
 				
-      def canvas_instructions_callback(self, texture, size, pos):
+      def canvas_instructions_callback(self, texture, tex_size, tex_pos):
 	### Add your Preview display code here
 ```
 
@@ -271,13 +271,13 @@ On Android this is an alternative to analyze_pixels_callback(), it is used for A
 	### Add your imageproxy specific analysis code here
 ```
 
-Keep to this pattern. Perform analysis and coordinate transforms in the 'analyze_pixel_callback' (or imageproxy) method. And in 'canvas_instructions_callback' only display the results of previous calculations. Data passed from the analysis method to the display method must be passed in a thread safe way, for example as shown in the second code fragment below.
+Keep to this pattern. Perform analysis and coordinate transforms in the 'analyze_pixel_callback' (or imageproxy) method. And in 'canvas_instructions_callback' only display the results of previous calculations, the arguments are not valid for coordinate transforms. Data passed from the analysis method to the display method must be passed in a thread safe way.
 
 The `analyze_pixels_callback` method is used to analyze its RGBA `pixels` and `size` arguments. The `pos`, `scale`, and `mirror` arguments enable mapping the analyzed pixels coordinates to Preview coordinates. The `mirror` parameter is required because `pixels` image is never mirrored, but the Preview may be. An example:
 
 ```python
- def analyze_pixels_callback(self, pixels, size, pos, scale, mirror):
-        pil_image = Image.frombytes(mode='RGBA', size=size, data= pixels)
+ def analyze_pixels_callback(self, pixels, image_size, image_pos, scale, mirror):
+        pil_image = Image.frombytes(mode='RGBA', size=image_size, data= pixels)
         barcodes = pyzbar.decode(pil_image, symbols=[ZBarSymbol.QRCODE])
         found = []
         for barcode in barcodes:
@@ -285,18 +285,18 @@ The `analyze_pixels_callback` method is used to analyze its RGBA `pixels` and `s
             if 'https://' in text or 'http://' in text:
                 x, y, w, h = barcode.rect
                 # Map Zbar coordinates to Kivy coordinates
-                y = size[1] -y -h
+                y = image_size[1] -y -h
                 # Map Analysis coordinates to Preview coordinates
                 if mirror:
-                    x = size[0] -x -w
-                x = round(x * scale + pos[0])
-                y = round(y * scale + pos[1])
+                    x = image_size[0] -x -w
+                x = round(x * scale + image_pos[0])
+                y = round(y * scale + image_pos[1])
                 w = round(w * scale)
                 h = round(h * scale)
                 found.append({'x':x, 'y':y, 'w':w, 'h':h, 't':text})
         self.make_thread_safe(list(found)) ## A COPY of the list
 ```
-Note that Kivy widget coordinates have their origin at the bottom left. Most other systems use top left (with positive y increaing downwards) as their origin. A test with a print statement to see what coordinate system your analysis code is using can be valuable. 
+Note that Kivy widget coordinates have their origin at the bottom left. Most other systems use top left (with positive y increaing downwards) as their origin. A test with a print statement to see what coordinate values your analysis code is using can be valuable. 
 
 Analysis and canvas annotation callbacks occur on different threads. The result of the analysis must be saved in a thread safe way, so that it is available for the canvas callback. We pass a **copy** of the result to:
 
@@ -306,29 +306,29 @@ Analysis and canvas annotation callbacks occur on different threads. The result 
         self.annotations = found
 ```
 
-And add the calculated thread safe annotations to the canvas:
+And add the calculated thread safe annotations to the canvas. 
 
 ```python
-    def canvas_instructions_callback(self, texture, size, pos):
+    def canvas_instructions_callback(self, texture, tex_size, tex_pos):
         # Add the annotations determinined during analyze callback.
         Color(1,0,0,1)
         for r in self.annotations:
             Line(rectangle=(r['x'], r['y'], r['w'], r['h']), width = dp(2))	
 ```
-
-We can also replace the existing Preview image with some other image. For example, with a thread safe texture created as a result of some image analysis:
+We can also replace the existing Preview image with some other texture, positioned with the tex_size and tex_pos arguments. The text_size and tex_pos are not valid for coordinate calculations as they contain mirror information. So, using a thread safe texture created as a result of some image analysis:
 
 ```python
-    def canvas_instructions_callback(self, texture, size, pos):
+    def canvas_instructions_callback(self, texture, tex_size, tex_pos):
         # Add a different preview image, which is a transformed camera image
 	# this image has 'analyze_pixels_resolution'
         if self.analyzed_texture:
 	    # 'self.analyzed_texture' contents created
 	    # by analyze_pixels_callback()
             Color(1,1,1,1)
-            Rectangle(texture= self.analyzed_texture, size = size, pos = pos)
+            Rectangle(texture= self.analyzed_texture,
+	              size = tex_size, pos = tex_pos)
 ```	   
-See the OpenCV example for details on creating a thread safe texture.
+See the OpenCV example for details on creating a thread safe texture. 
 
 The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/blob/main/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/blob/main/edgedetect.py). Similar examples exhibiting this pattern are [tflite](https://github.com/Android-for-Python/c4k_tflite_example/blob/main/classifyobject.py) and [mlkit](https://github.com/Android-for-Python/c4k_mlkit_example/blob/main/facedetect.py).
 
