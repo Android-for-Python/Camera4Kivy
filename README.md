@@ -307,7 +307,7 @@ Analysis and canvas annotation callbacks occur on different threads. The result 
         self.annotations = found
 ```
 
-And add the calculated thread safe annotations to the canvas. 
+And add the thread safe annotations to the canvas. 
 
 ```python
     def canvas_instructions_callback(self, texture, tex_size, tex_pos):
@@ -316,7 +316,7 @@ And add the calculated thread safe annotations to the canvas.
         for r in self.annotations:
             Line(rectangle=(r['x'], r['y'], r['w'], r['h']), width = dp(2))	
 ```
-We can also replace the existing Preview image with some other texture, positioned with the tex_size and tex_pos arguments. The text_size and tex_pos are not valid for coordinate calculations as they contain mirror information. So, using a thread safe texture created as a result of some image analysis:
+We can also replace the existing Preview image with some other texture, positioned with the tex_size and tex_pos arguments. The text_size and tex_pos are not valid for coordinate calculations as they are encoded if the Preview is mirrored. So, use a thread safe texture created as a result of some image analysis like this:
 
 ```python
     def canvas_instructions_callback(self, texture, tex_size, tex_pos):
@@ -354,6 +354,8 @@ That package's gesture callbacks, and an annotation location test are used to in
                y >= r['y'] and y <= r['y'] + r['h']:
                 webbrowser.open_new_tab(r['t'])
 ```
+
+### Coordinates and image encoding
 
 **Important**, be aware of different coordinate systems and image encoding. A test with a print statement to see what coordinate values your analysis code is using can be valuable. 
 
