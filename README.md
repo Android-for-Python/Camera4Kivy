@@ -322,7 +322,7 @@ And add the thread safe annotations to the canvas.
         for r in self.annotations:
             Line(rectangle=(r['x'], r['y'], r['w'], r['h']), width = dp(2))	
 ```
-We can also replace the existing Preview image with some other texture, positioned with the tex_size and tex_pos arguments. The text_size and tex_pos are not valid for coordinate calculations as they are encoded if the Preview is mirrored. So, use a thread safe texture created as a result of some image analysis like this:
+We can also replace the existing Preview image with some other texture, positioned with the tex_size and tex_pos arguments. The text_size and tex_pos are not valid for coordinate calculations as they are encoded if the Preview is mirrored. Use a thread safe texture created as a result of some image analysis like this:
 
 ```python
     def canvas_instructions_callback(self, texture, tex_size, tex_pos):
@@ -338,6 +338,8 @@ We can also replace the existing Preview image with some other texture, position
 See the OpenCV example for details on creating a thread safe texture. 
 
 The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/blob/main/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/blob/main/edgedetect.py). Similar examples exhibiting this pattern are [tflite](https://github.com/Android-for-Python/c4k_tflite_example/blob/main/classifyobject.py) and [mlkit](https://github.com/Android-for-Python/c4k_mlkit_example/blob/main/facedetect.py).
+
+### User Interaction
 
 But wait, there is more, a user can interact with the analysis results in the Preview. The Preview subclass may have multiple inheritance, for example to allow the user to interact with annotations on the screen. The QR Reader example illustrates this, by inheriting from a gestures package:
 
