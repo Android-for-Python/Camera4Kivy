@@ -357,7 +357,7 @@ That package's gesture callbacks, and an annotation location test are used to in
 
 ### Coordinates and image encoding
 
-**Important**, be aware of different coordinate systems and image encoding. A test with a print statement to see what coordinate values thirt party analysis code is using can be valuable. 
+**Important**, be aware of different coordinate systems and image encoding. A test with a print statement to see what coordinate values third party analysis code is using can be valuable. 
 
 - Kivy image coordinates have their origin at the bottom left. Most other systems use top left (with positive y increaing downwards) as their origin.
 
