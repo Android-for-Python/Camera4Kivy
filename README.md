@@ -7,7 +7,6 @@ This document has these sections [Overview](https://github.com/Android-for-Pytho
 
 On Android only:
 - Do not [install an arm7 build on an arm8 device](#behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device).
-- Do not [build with 'kivy==master'](#behavior-android-kivymaster-black-screen)
 
 ## Overview
 
@@ -322,7 +321,7 @@ And add the thread safe annotations to the canvas.
         for r in self.annotations:
             Line(rectangle=(r['x'], r['y'], r['w'], r['h']), width = dp(2))	
 ```
-We can also replace the existing Preview image with some other texture, positioned with the tex_size and tex_pos arguments. The text_size and tex_pos are not valid for coordinate calculations as they are encoded if the Preview is mirrored. Use a thread safe texture created as a result of some image analysis like this:
+We can also replace the existing Preview image with some other texture, positioned with the 'tex_size' and 'tex_pos' arguments. Use a thread safe texture created as a result of some image analysis like this:
 
 ```python
     def canvas_instructions_callback(self, texture, tex_size, tex_pos):
@@ -335,6 +334,8 @@ We can also replace the existing Preview image with some other texture, position
             Rectangle(texture= self.analyzed_texture,
 	              size = tex_size, pos = tex_pos)
 ```	   
+The new texture will be automatically mirrored by 'text_size' and 'tex_pos' if required. These 'text_size' and 'tex_pos' arguments are for adding a texture, and not valid for coordinate calculations as they are potentially mirrored.
+
 See the OpenCV example for details on creating a thread safe texture. 
 
 The above code fragments are fully implemented in two examples: [QR Reader](https://github.com/Android-for-Python/c4k_qr_example/blob/main/qrreader.py), and [OpenCV](https://github.com/Android-for-Python/c4k_opencv_example/blob/main/edgedetect.py). Similar examples exhibiting this pattern are [tflite](https://github.com/Android-for-Python/c4k_tflite_example/blob/main/classifyobject.py) and [mlkit](https://github.com/Android-for-Python/c4k_mlkit_example/blob/main/facedetect.py).
@@ -371,7 +372,9 @@ That package's gesture callbacks, and an annotation location test are used to in
 
 - Kivy image properties are a (width, height) tuple. Some packages, notably numpy images, reverse the order to (height, width).
 
-- Kivy pixels are encoded RGBA. Third party analysis code may expect some other encoding, both Pillow and OpenCV provide encoding converions. Some image recodings are computationally expensive. 
+- Kivy pixels are encoded RGBA. Third party analysis code may expect some other encoding, both Pillow and OpenCV provide encoding converions. Some image recodings are computationally expensive.
+
+- The Preview 'canvas_instructions_callback()' arguments 'tex_size' and 'tex_pos' are potentially mirrored and their values are not valid for coordinate mapping. Perform mapping in 'analyze_pixels_callback()' using the 'image_size' and 'image_pos' arguments.
 
 
 ### Analysis Configuration
@@ -557,12 +560,5 @@ When switching cameras there may be a short duration inverted image, this is mor
 
 The implementation of Google's camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device. To rin on an arm64-v8a device you **must** build for arm64-v8a.
 
-### Behavior: Android 'kivy==master' black screen
-
-Logcat message:
-
-"TypeError: Cannot create graphics instruction outside the main Kivy thread".
-
-This is a 'Kivy==master' [issue](https://github.com/kivy/kivy/issues/7733), workaround use 'kivy==2.0.0'.
 
 
