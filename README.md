@@ -359,11 +359,11 @@ That package's gesture callbacks, and an annotation location test are used to in
 
 **Important**, be aware of different coordinate systems and image encoding. A test with a print statement to see what coordinate values your analysis code is using can be valuable. 
 
-Kivy image coordinates have their origin at the bottom left. Most other systems use top left (with positive y increaing downwards) as their origin.
+- Kivy image coordinates have their origin at the bottom left. Most other systems use top left (with positive y increaing downwards) as their origin.
 
-Kivy image properties are a (width, height) tuple. Some packages, notably numpy, reverse the order to (height, width).
+- Kivy image properties are a (width, height) tuple. Some packages, notably numpy, reverse the order to (height, width).
 
-Kivy pixels are encoded RGBA. Third party analysis code may expect some other encoding, both Pillow and OpenCV provide encoding converions. Some image recodings are computationally expensive. 
+- Kivy pixels are encoded RGBA. Third party analysis code may expect some other encoding, both Pillow and OpenCV provide encoding converions. Some image recodings are computationally expensive. 
 
 
 ### Analysis Configuration
