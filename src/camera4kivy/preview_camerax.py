@@ -313,12 +313,13 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             translate = -(long_edge - short_edge) /2
         elif rotation == 270:
             translate = (long_edge - short_edge) /2
-            
-        if self.facing == 'front':
-            if rotation == 90 or rotation == 270:
-                scaley = -1
-            else:
-                scalex = -1
+
+        # move to canvas_callback
+        #if self.facing == 'front':
+        #    if rotation == 90 or rotation == 270:
+        #        scaley = -1
+        #    else:
+        #        scalex = -1
 
         if texture_size[0] < texture_size[1]:
             translate = -translate
@@ -396,12 +397,22 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
     @mainthread
     def _update_canvas(self):
         tex = self._fbo.texture.get_region(*self.crop)
+
+        # moved from create_fbo
+        if self.facing == 'front':
+            view_size = (-self.view_size[0], self.view_size[1])
+            view_pos = (self.view_pos[0] + self.view_size[0],
+                        self.view_pos[1])
+        else:
+            view_size = self.view_size
+            view_pos  = self.view_pos
+        
         self.canvas.clear()
         with self.canvas:
             Color(1,1,1,1)
-            Rectangle(texture= tex, size = self.view_size, pos = self.view_pos)
+            Rectangle(texture= tex, size = view_size, pos = view_pos)
             if self.canvas_callback:
-                self.canvas_callback(tex, self.view_size, self.view_pos)
+                self.canvas_callback(tex, view_size, view_pos)
 
     #######################################
     # Storage Location
