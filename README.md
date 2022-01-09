@@ -374,7 +374,7 @@ That package's gesture callbacks, and an annotation location test are used to in
 
 - Kivy pixels are encoded RGBA. Third party analysis code may expect some other encoding, both Pillow and OpenCV provide encoding converions. Some image recodings are computationally expensive.
 
-- The Preview 'canvas_instructions_callback()' arguments 'tex_size' and 'tex_pos' are potentially mirrored and their values are not valid for coordinate mapping. Perform mapping in 'analyze_pixels_callback()' using the 'image_size' and 'image_pos' arguments.
+- The 'canvas_instructions_callback()' arguments 'tex_size' and 'tex_pos' are potentially mirrored and their values are not valid for coordinate mapping. Perform mapping in 'analyze_pixels_callback()' using the 'image_size' and 'image_pos' arguments.
 
 
 ### Analysis Configuration
