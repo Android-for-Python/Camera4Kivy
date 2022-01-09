@@ -278,8 +278,10 @@ Keep to this pattern. Perform analysis and coordinate transforms in the 'analyze
 The `analyze_pixels_callback` method is used to analyze its RGBA `pixels` and `size` arguments. The `pos`, `scale`, and `mirror` arguments enable mapping the analyzed pixels coordinates to Preview coordinates. The `mirror` parameter is required because `pixels` image is never mirrored, but the Preview may be. An example:
 
 ```python
- def analyze_pixels_callback(self, pixels, image_size, image_pos, scale, mirror):
-        pil_image = Image.frombytes(mode='RGBA', size=image_size, data= pixels)
+   def analyze_pixels_callback(self, pixels, image_size, image_pos,
+                               scale, mirror):
+        pil_image = Image.frombytes(mode='RGBA', size=image_size,
+	                            data= pixels)
         barcodes = pyzbar.decode(pil_image, symbols=[ZBarSymbol.QRCODE])
         found = []
         for barcode in barcodes:
