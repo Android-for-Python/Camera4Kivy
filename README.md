@@ -253,21 +253,23 @@ Android only, if available on device. Called by a tap gesture unless disabled
 
 ### Overview and Examples
 
-The programming pattern for video data analysis is to create a subclass of `Preview` and implement two predefined methods. One to analyze the frame, the second to create and annotate the Preview image. In general like this:
+The programming pattern for video data analysis is to create a subclass of `Preview` and implement two predefined methods. One to analyze the frame, the second to modify the Preview image with the analysis result. In general like this:
 
 ```python
 class CustomAnalyzer(Preview):
-      def analyze_pixels_callback(self, pixels, size, image_pos, image_scale, mirror):
+      def analyze_pixels_callback(self, pixels, size, image_pos,
+                                  image_scale, mirror):
 	### Add your pixels analysis code here
 	### Add your coordinate transforms here
 				
       def canvas_instructions_callback(self, texture, tex_size, tex_pos):
-	### Add your Preview display code here
+	### Add your Preview annotation or image replacement code here
 ```
 
 On Android this is an alternative to analyze_pixels_callback(), it is used for Android only analysis packages.
 ```
-      def analyze_imageproxy_callback(self, image_proxy, image_pos, image_scale, mirror, degrees):
+      def analyze_imageproxy_callback(self, image_proxy, image_pos,
+                                      image_scale, mirror, degrees):
 	### Add your imageproxy specific analysis code here
 ```
 
@@ -296,7 +298,6 @@ The `analyze_pixels_callback` method is used to analyze its RGBA `pixels` and `s
                 found.append({'x':x, 'y':y, 'w':w, 'h':h, 't':text})
         self.make_thread_safe(list(found)) ## A COPY of the list
 ```
-Note that Kivy widget coordinates have their origin at the bottom left. Most other systems use top left (with positive y increaing downwards) as their origin. A test with a print statement to see what coordinate values your analysis code is using can be valuable. 
 
 Analysis and canvas annotation callbacks occur on different threads. The result of the analysis must be saved in a thread safe way, so that it is available for the canvas callback. We pass a **copy** of the result to:
 
@@ -353,6 +354,14 @@ That package's gesture callbacks, and an annotation location test are used to in
                y >= r['y'] and y <= r['y'] + r['h']:
                 webbrowser.open_new_tab(r['t'])
 ```
+
+**Important**, be aware of different coordinate systems and image encoding. A test with a print statement to see what coordinate values your analysis code is using can be valuable. 
+
+Kivy image coordinates have their origin at the bottom left. Most other systems use top left (with positive y increaing downwards) as their origin.
+
+Kivy image properties are a (width, height) tuple. Some packages, notably numpy, reverse the order to (height, width).
+
+Kivy pixels are encoded RGBA. Third party analysis code may expect some other encoding, both Pillow and OpenCV provide encoding converions. 
 
 
 ### Analysis Configuration
