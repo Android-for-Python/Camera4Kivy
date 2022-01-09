@@ -363,7 +363,7 @@ Kivy image coordinates have their origin at the bottom left. Most other systems 
 
 Kivy image properties are a (width, height) tuple. Some packages, notably numpy, reverse the order to (height, width).
 
-Kivy pixels are encoded RGBA. Third party analysis code may expect some other encoding, both Pillow and OpenCV provide encoding converions. 
+Kivy pixels are encoded RGBA. Third party analysis code may expect some other encoding, both Pillow and OpenCV provide encoding converions. Some image recodings are computationally expensive. 
 
 
 ### Analysis Configuration
