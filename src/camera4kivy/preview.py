@@ -191,22 +191,23 @@ class Preview(AnchorLayout):
     # analyze_pixels_callback()
     #
     # pixels        : Kivy Texture pixels, always RGBA
-    # size          : size of pixels
+    # image_size    : size of pixels
     # image_pos     : Bottom left corner of analysis Texture inside the
     #    Preview. AKA the letterbox size plus modified aspect ratio adjustment.
     # image_scale   : Ratio between the analyzed Texture resolution and
     #    screen image resolution.
     # mirror        : True if Preview is mirrored
     
-    def analyze_pixels_callback(self, pixels, size, image_pos, image_scale,
-                                mirror):
+    def analyze_pixels_callback(self, pixels, image_size, image_pos,
+                                image_scale, mirror):
         pass
 
     # canvas_instructions_callback()
     #
-    # texture  : the default texture to bedisplayed in the Priview
-    # size     : 
-    def canvas_instructions_callback(self, texture, size, pos):
+    # texture  : the default texture to be displayed in the Priview
+    # tex_size : texture size with mirror information
+    # tex_pos  : texture pos with mirror information
+    def canvas_instructions_callback(self, texture, tex_size, tex_pos):
         pass
 
     # analyze_imageproxy_callback()
