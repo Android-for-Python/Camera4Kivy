@@ -280,9 +280,12 @@ The `analyze_pixels_callback` method is used to analyze its RGBA `pixels` and `s
 ```python
    def analyze_pixels_callback(self, pixels, image_size, image_pos,
                                scale, mirror):
+	# Convert the image encoding		       
         pil_image = Image.frombytes(mode='RGBA', size=image_size,
 	                            data= pixels)
+        # Analyze the image				    
         barcodes = pyzbar.decode(pil_image, symbols=[ZBarSymbol.QRCODE])
+	# Collect the results and transform the coordinates
         found = []
         for barcode in barcodes:
             text = barcode.data.decode('utf-8')
@@ -298,6 +301,7 @@ The `analyze_pixels_callback` method is used to analyze its RGBA `pixels` and `s
                 w = round(w * scale)
                 h = round(h * scale)
                 found.append({'x':x, 'y':y, 'w':w, 'h':h, 't':text})
+	# Save the results in a thread safe way
         self.make_thread_safe(list(found)) ## A COPY of the list
 ```
 
