@@ -1,4 +1,5 @@
 from threading import Thread
+from kivy.clock import mainthread
 from kivy.utils import platform
 from kivy.core import core_select_lib
 from kivy.graphics import Rectangle, Color
@@ -253,6 +254,7 @@ class PreviewKivyCamera(PreviewCommon):
         self.tscale = self.view_size[1] / crop_siz_y 
 
 
+    @mainthread
     def canvas_text(self,text):
         label = CoreLabel(font_size = sp(16))
         label.text = text
