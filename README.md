@@ -230,7 +230,7 @@ On Android the value can only be `'shared'` or `'private'`, other values are ign
 
 ##### subdir
 
-The value replaces the default value of `<subdir>`, the subdirectory will be created. 
+The value replaces the default value of `<subdir>`. The subdirectory will be created or added to the Android MediaStore path.
 
 ##### name
 
