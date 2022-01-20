@@ -218,7 +218,7 @@ The [filepath_callback](https://github.com/Android-for-Python/Camera4Kivy#filepa
 
 Be aware that on Android >= 10 shared storage files are saved in a database, called MediaStore, and not in a file system. The architecture of Android storage is outside the scope of this document. 
 
-The values of `<location>`, `<subdir>`, and `<name>` can be modified with optional keyword arguments:
+The values of `<location>`, `<subdir>`, and `<name>` can be modified with optional keyword arguments to the three `capture_` methods:
 
 ##### location
 
