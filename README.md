@@ -222,7 +222,7 @@ The values of \<location\>, \<date\>, \<time\> can be modified with optional key
 
 ##### location :
 
-The value replaces \<location\>.
+The value replaces the default value of \<location\>.
 
 On a desktop the value is directory that must exist. 
 
@@ -230,11 +230,11 @@ On Android the value can only be 'shared' or 'private', other values are ignored
 
 ##### subdir
 
-The value replaces \<date\>, the subdirectory will be created. 
+The value replaces the default value of \<date\>, the subdirectory will be created. 
 
 ##### name
 
-The value replaces \<time\>, the '.jpg' or '.mp4' extensions will be added automatically.
+The value replaces the default value of \<time\>, the '.jpg' or '.mp4' extensions will be added automatically.
 
 Note that it is a characteristic of Android >= 10 shared storage that a second capture with a same subdir and name values as the first, will not overwrite the first. It will create a second file named '\<subdir\>/\<name\> (1).jpg', the name is created by Android MediaStore. The MediaStore may crash if it creates too many (31 ?) such names.
 
