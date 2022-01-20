@@ -210,7 +210,7 @@ Always do this. It is sometimes critically important to disconnect the camera wh
     def stop_capture_video(self):         # Android only
 ```
 
-Captures are saved to '<location>/<date>/<time>.jpg' or '.mp4'.
+Captures are saved to '\<location\>/\<date\>/\<time\>.jpg' or '.mp4'.
 
 The default values are as follows. On a desktop <location> is '.', on Android <location> is 'DCIM/<appname>'. The value of <date> is the current date, the format is 'YYYY_MM_DD'. The value of <time> is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
 
