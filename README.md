@@ -236,7 +236,7 @@ The value replaces the default value of `<subdir>`. The subdirectory will be cre
 
 The value replaces the default value of `<name>`, the `.jpg` or `.mp4` extensions will be added automatically.
 
-Note that it is a characteristic of Android >= 10 shared storage that a second capture with a same subdir and name values as the first will not overwrite the first. It will create a second file named `<subdir>/<name> (1).jpg`, this name is created by Android MediaStore. The MediaStore may crash if it creates too many (31 ?) such names.
+Note that it is a characteristic of Android MediaStore that a second capture with a same subdir and name values as the first will not overwrite the first. It will create a second file named `<subdir>/<name> (1).jpg`, this name is created by Android MediaStore. The MediaStore may crash if it creates too many (31 ?) such names.
 
 #### Select Camera
 
