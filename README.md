@@ -212,13 +212,13 @@ Always do this. It is sometimes critically important to disconnect the camera wh
 
 Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`.
 
-The default values are as follows. On a desktop `<location>` is `.`, on Android `<location>` is `DCIM/<appname>`. The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'. The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
+The default values are as follows. On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`. The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'. The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
 
 The [filepath_callback](https://github.com/Android-for-Python/Camera4Kivy#filepath_callback) reports the actual path for a particular capture.
 
 Be aware that on Android >= 10 shared storage files are saved in a database, called MediaStore, and not in a file system. The characteristics of Android storage are outside the scope of this document. 
 
-The values of `<location>`, `<subdir>`, `<name>` can be modified with optional keyword arguments:
+The values of `<location>`, `<subdir>`, and `<name>` can be modified with optional keyword arguments:
 
 ##### location :
 
@@ -226,7 +226,7 @@ The value replaces the default value of `<location>`.
 
 On a desktop the value is directory that must exist. 
 
-On Android the value can only be 'shared' or 'private', other values are ignored. The value 'shared' specifies Android shared storage `DCIM/<appname>` (this is also the default). The value 'private' specifies app local storage `app_storage_path()/DCIM`. If you want a different location use 'private' and move the resulting file based on the path provided by filepath_callback.
+On Android the value can only be `'shared'` or `'private'`, other values are ignored. The value `'shared'` specifies Android shared storage `DCIM/<appname>` (this is also the default). The value `'private'` specifies app local storage `app_storage_path()/DCIM`. If you want a different location use 'private' and move the resulting file based on the path provided by filepath_callback.
 
 ##### subdir
 
