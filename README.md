@@ -216,7 +216,7 @@ The default values are as follows. On a desktop `<location>` is the current dire
 
 The [filepath_callback](https://github.com/Android-for-Python/Camera4Kivy#filepath_callback) reports the actual path for a particular capture.
 
-Be aware that on Android >= 10 shared storage files are saved in a database, called MediaStore, and not in a file system. The characteristics of Android storage are outside the scope of this document. 
+Be aware that on Android >= 10 shared storage files are saved in a database, called MediaStore, and not in a file system. The architecture of Android storage is outside the scope of this document. 
 
 The values of `<location>`, `<subdir>`, and `<name>` can be modified with optional keyword arguments:
 
@@ -224,7 +224,7 @@ The values of `<location>`, `<subdir>`, and `<name>` can be modified with option
 
 The value replaces the default value of `<location>`.
 
-On a desktop the value is directory that must exist. 
+On a desktop the value is a directory that must exist. 
 
 On Android the value can only be `'shared'` or `'private'`, other values are ignored. The value `'shared'` specifies Android shared storage `DCIM/<appname>` (this is also the default). The value `'private'` specifies app local storage `app_storage_path()/DCIM`. If you want a different location use 'private' and move the resulting file based on the path provided by filepath_callback.
 
