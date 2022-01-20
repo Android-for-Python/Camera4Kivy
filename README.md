@@ -220,7 +220,7 @@ Be aware that on Android >= 10 shared storage files are saved in a database, cal
 
 The values of `<location>`, `<subdir>`, and `<name>` can be modified with optional keyword arguments:
 
-##### location :
+##### location
 
 The value replaces the default value of `<location>`.
 
