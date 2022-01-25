@@ -228,7 +228,7 @@ The value replaces the default value of `<location>`.
 
 On a desktop the value is a directory that must exist. 
 
-On Android the value can only be `'shared'` or `'private'`, other values are ignored. The value `'shared'` specifies Android shared storage `DCIM/<appname>` (this is also the default). The value `'private'` specifies app local storage `app_storage_path()/DCIM`. If you want a different location use 'private' and move the resulting file based on the path provided by filepath_callback.
+On Android the value can only be `'shared'` or `'private'`, other values default to 'shared'. The value `'shared'` specifies Android shared storage `DCIM/<appname>`. The value `'private'` specifies app local storage `app_storage_path()/DCIM`. If you want a different location use 'private' and move the resulting file based on the path provided by filepath_callback.
 
 ##### subdir
 
