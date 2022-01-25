@@ -199,7 +199,7 @@ Applies only to the Android ImageProxy api. 'yuv420' (default) or 'rgba'.
 
 #### Disconnect Camera
 
-Always do this. It is sometimes critically important to disconnect the camera when it is no longer used. 
+Always do this. It is sometimes critically important to disconnect the camera when it is no longer used. Do not disconnect the camera between a capture method call and its filepath_callback.
 ```python
     def disconnect_camera(self):
 ```
