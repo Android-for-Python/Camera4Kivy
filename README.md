@@ -170,7 +170,9 @@ Specify which camera to connect to. For example `camera_id = 'front'`. A string 
 Boolean default True. Mirrors the preview image. Ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored.
 
 ##### filepath_callback
-On a capture of a photo, video, or screenshot, this callback returns the path and name of the saved file. For example `filepath_callback = my_method`, where `def my_method(self, path):` is an app supplied method with a string argument.
+On a capture of a photo, video, or screenshot, this argument specifies a method to receive the path and name of the saved file. For example `filepath_callback = my_method`, where `def my_method(self, path):` is an app supplied method with a string argument.
+
+Photo and Video captures may be implemented in a different thread. The only way to know that a capture is complete is a filepath_callback, do not disconnect the camera between a capture method call and its filepath_callback.
 
 ##### sensor_resolution
 Overrides the default sensor resolution, which is the highest resolution available, except Raspberry Pi where it is (1024, 768). Tuple of two integers, for example `sensor_resolution = (640, 480)`. The resulting capture resolution obtained depends on the behavior of the camera provider (for example it is ignored by GStreamer). The capture resolution also depends on the relative orientation and aspect ratio of the Preview. Treat the value specified as a request that may not be exactly honored.
@@ -214,7 +216,7 @@ Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`.
 
 The default values are as follows. On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`. The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'. The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
 
-The [filepath_callback](https://github.com/Android-for-Python/Camera4Kivy#filepath_callback) reports the actual path for a particular capture.
+The [filepath_callback](https://github.com/Android-for-Python/Camera4Kivy#filepath_callback) occurs on capture completion, with an argument that is the actual path for a particular capture. 
 
 Be aware that on Android >= 10 shared storage files are saved in a database, called MediaStore, and not in a file system. The architecture of Android storage is outside the scope of this document. 
 
