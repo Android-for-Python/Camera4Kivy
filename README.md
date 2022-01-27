@@ -449,11 +449,11 @@ This is a phyical property of the sensor module. The default behavior of `connec
 
 #### Cropped Sensor Resolution
 
-The sensor resolution cropped according to the orientation of the sensor, the orientation of the Preview, and the aspect ratio of the Preview. The will impact the capture resolution, for example a 16:9 aspect image maybe cropped from a 4:3 sensor image. Thus the product of width and height will less for 16:9 that for 4:3 in this case.
+The [sensor resolution](https://github.com/Android-for-Python/Camera4Kivy#sensor-resolution) cropped according to the orientation of the sensor, the orientation of the Preview, and the aspect ratio of the Preview. The will impact the capture resolution, for example a 16:9 aspect image maybe cropped from a 4:3 sensor image. Thus the product of width and height will less for 16:9 that for 4:3 in this case.
 
 Rotating a mobile device also rotates the sensor, the highest resolution images are obtained when the Priview widget orientation is the same as the device orientation. Conversly for example a landscape preview with the device in portrait orientation will result in an image width resolution that is the sensor height resolution.
 
-This behaviour is a characteric of the camera having a physical constraint resolution. It is mostly transparent to the app user unless the sensor resolution is low, or a photo capture has lower than expected resolution.
+This behaviour is a characteric of the camera sensor having a physical constraints. Notably that image sensors are usually not square, they are rectangular and give the highest quality results when the sensor has the same orientation as the captured image. This is mostly transparent to the app user unless the sensor resolution is low, or a photo capture has lower than expected resolution.
 
 #### Preview Resolution
 
