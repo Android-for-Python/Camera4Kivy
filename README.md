@@ -212,7 +212,9 @@ Always do this. It is sometimes critically important to disconnect the camera wh
     def stop_capture_video(self):         # Android only
 ```
 
-Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`. Captures are never mirrored, except a screenshot capture if the Preview is mirrored.
+Captures are never mirrored, except a screenshot capture if the Preview is mirrored. Capture resolution varies as discussed [here](https://github.com/Android-for-Python/Camera4Kivy#capture-resolution).
+
+Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`. 
 
 The default values are as follows. On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`. The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'. The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
 
@@ -459,7 +461,7 @@ Is a physical property of the screen (display resolution) and the Preview widget
 
 #### Capture Resolution
 
-The resolution of a capture. A photo capture resolution is cropped sensor resolution. Video resolution is one to the standard resolutions, depending on the cropped sensor resolution. A screenshot capture resolution is the Preview resolution. 
+The resolution of a capture. A photo capture resolution is [cropped sensor resolution](https://github.com/Android-for-Python/Camera4Kivy#cropped-sensor-resolution). Video resolution is one to the standard resolutions, depending on the cropped sensor resolution. A screenshot capture size in pixels is the [Preview resolution](https://github.com/Android-for-Python/Camera4Kivy#preview-resolution). 
 
 #### Analysis Resolution
 
