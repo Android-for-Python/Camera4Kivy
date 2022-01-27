@@ -212,7 +212,7 @@ Always do this. It is sometimes critically important to disconnect the camera wh
     def stop_capture_video(self):         # Android only
 ```
 
-Captures are never mirrored, except a screenshot capture if the Preview is mirrored. Capture resolution varies as discussed [here](https://github.com/Android-for-Python/Camera4Kivy#capture-resolution).
+Captures are never mirrored, except a screenshot capture if the Preview is mirrored. Capture resolution is discussed [here](https://github.com/Android-for-Python/Camera4Kivy#capture-resolution).
 
 Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`. 
 
