@@ -167,7 +167,7 @@ Optional arguments:
 Specify which camera to connect to. For example `camera_id = 'front'`. A string containing an integer (default '0'), or on Android 'back' (default), or 'front'.
 
 ##### mirrored
-Boolean default True. Mirrors the preview image. Ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored.
+Boolean default True. Mirrors the preview image. Ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored. Captures are never mirrored, except a screenshot capture if the Preview is mirrored.
 
 ##### filepath_callback
 On a capture of a photo, video, or screenshot, this argument specifies a method to receive the path and name of the saved file. For example `filepath_callback = my_method`, where `def my_method(self, path):` is an app supplied method with a string argument.
@@ -212,7 +212,7 @@ Always do this. It is sometimes critically important to disconnect the camera wh
     def stop_capture_video(self):         # Android only
 ```
 
-Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`.
+Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`. Captures are never mirrored, except a screenshot capture if the Preview is mirrored.
 
 The default values are as follows. On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`. The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'. The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
 
