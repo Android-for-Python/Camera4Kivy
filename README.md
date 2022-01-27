@@ -465,7 +465,7 @@ The resolution of a capture. A photo capture resolution is [cropped sensor resol
 
 #### Analysis Resolution
 
-Analysis resolution is less than or equal to cropped sensor resolution. It may be useful to reduce this in order to decrease analysis time, at the cost of analysis resolution.  
+Analysis resolution is less than or equal to [cropped sensor resolution](https://github.com/Android-for-Python/Camera4Kivy#cropped-sensor-resolution). It may be useful to reduce this in order to decrease analysis time, at the cost of analysis resolution.  
 
 The `analyze_pixels_callback()` resolution may be changed with the `analyze_pixels_resolution` camera connect option. The scale parameter allows re-scaling of the analysis results to the Preview resolution.
 
