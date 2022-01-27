@@ -457,7 +457,7 @@ This behaviour is a characteric of the camera sensor having physical constraints
 
 #### Preview Resolution
 
-Is a physical property of the screen (display resolution) and the Preview widget size on the screen. The preview resolution can be less than or greater than the cropped sensor resolution.
+Is a physical property of the screen ([display resolution](https://github.com/Android-for-Python/Camera4Kivy#display-resolution)) and the Preview widget size on the screen. The preview resolution can be less than or greater than the cropped sensor resolution.
 
 #### Capture Resolution
 
