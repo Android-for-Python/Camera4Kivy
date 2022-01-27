@@ -453,7 +453,7 @@ The [sensor resolution](https://github.com/Android-for-Python/Camera4Kivy#sensor
 
 Rotating a mobile device also rotates the sensor, the highest resolution images are obtained when the Priview widget orientation is the same as the device orientation. Conversly for example a landscape preview with the device in portrait orientation will result in an image width resolution that is the sensor height resolution.
 
-This behaviour is a characteric of the camera sensor having a physical constraints. Notably that image sensors are usually not square, they are rectangular and give the highest quality results when the sensor has the same orientation as the captured image. This is mostly transparent to the app user unless the sensor resolution is low, or a photo capture has lower than expected resolution.
+This behaviour is a characteric of the camera sensor having physical constraints. Notably that image sensors are usually not square, they are rectangular and give the highest quality results when the sensor has the same orientation as the captured image. This is mostly transparent to the app user unless the sensor resolution is low, or a photo capture has lower than expected resolution.
 
 #### Preview Resolution
 
