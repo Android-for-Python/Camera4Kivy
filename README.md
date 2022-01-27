@@ -167,7 +167,7 @@ Optional arguments:
 Specify which camera to connect to. For example `camera_id = 'front'`. A string containing an integer (default '0'), or on Android 'back' (default), or 'front'.
 
 ##### mirrored
-Boolean default True. Mirrors the preview image. Ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored. Captures are never mirrored, except a screenshot capture if the Preview is mirrored.
+Boolean default `True`. Mirrors the preview image. Ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored. Captures are never mirrored, except a screenshot capture if the Preview is mirrored.
 
 ##### filepath_callback
 On a capture of a photo, video, or screenshot, this argument specifies a method to receive the path and name of the saved file. For example `filepath_callback = my_method`, where `def my_method(self, path):` is an app supplied method with a string argument.
