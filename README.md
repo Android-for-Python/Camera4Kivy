@@ -171,7 +171,7 @@ Mirrors the Preview image, default is `True`. This option is ignored on Android 
 
 Captures are never mirrored, except a screenshot capture if the Preview is mirrored.
 
-The pixels argument to `image_analysis_callback()` is never mirrored, if a Preview is mirrored a `texture` result of any image analysis will be automatically mirrored in the `canvas_instructions_callback()` by the tex_size and tex_pos arguments. If image analysis genetates image annotation locations, these locations must be adjusted by the app for a mirrored preview. See the [Image Analysis Section](https://github.com/Android-for-Python/camera4kivy#image-analysis) for code fragmets and links to examples.  
+The pixels argument to `image_analysis_callback()` is never mirrored, if a Preview is mirrored a `texture` result of any image analysis will be automatically mirrored in the `canvas_instructions_callback()` by the tex_size and tex_pos arguments. If image analysis genetates image annotation locations, these locations must be adjusted by the app for a mirrored preview. See the [Image Analysis Section](https://github.com/Android-for-Python/camera4kivy#image-analysis) for code fragments and links to examples.  
 
 ##### filepath_callback
 On a capture of a photo, video, or screenshot, this argument specifies a method to receive the path and name of the saved file. For example `filepath_callback = my_method`, where `def my_method(self, path):` is an app supplied method with a string argument.
