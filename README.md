@@ -176,7 +176,9 @@ The pixels argument to `image_analysis_callback()` is never mirrored, if a Previ
 ##### filepath_callback
 On a capture of a photo, video, or screenshot, this argument specifies a method to receive the path and name of the saved file. For example `filepath_callback = my_method`, where `def my_method(self, path):` is an app supplied method with a string argument.
 
-Photo and Video captures may be implemented in a different thread. The only way to know that a capture is complete is a filepath_callback, do not disconnect the camera between a capture method call and its filepath_callback.
+Photo and Video captures may be implemented in a different thread. The only way to know that a capture is complete is a filepath_callback. There may be [latency](https://github.com/Android-for-Python/Camera4Kivy#latency) concequences of disconnecting the camera after initiating a capture and before a filepath_callback.
+
+The filepath_callback can also be used to reset any 'video recording' indicator in the UI. While video recording is normally terminated by the user, it can also be terminated by app pause, device rotation, or camera selection. In these last cases the any recording indicator can be reset by the callback, which occurs on any capture termination regardless of cause. 
 
 ##### sensor_resolution
 Overrides the default sensor resolution, which is the highest resolution available, except Raspberry Pi where it is (1024, 768). Tuple of two integers, for example `sensor_resolution = (640, 480)`. The resulting capture resolution obtained depends on the behavior of the camera provider (for example it is ignored by GStreamer). The capture resolution also depends on the relative orientation and aspect ratio of the Preview. Treat the value specified as a request that may not be exactly honored.
@@ -203,11 +205,13 @@ Applies only to the Android ImageProxy api. 'yuv420' (default) or 'rgba'.
 
 #### Disconnect Camera
 
-Always do this. It is sometimes critically important to disconnect the camera when it is no longer used. Do not disconnect the camera between a capture method call and its filepath_callback.
+Always do this. It is sometimes critically important to disconnect the camera when it is no longer used.
+
 ```python
     def disconnect_camera(self):
 ```
-  
+There may be [latency](https://github.com/Android-for-Python/Camera4Kivy#latency) concequences of disconnecting the camera after initiating a capture and before a filepath_callback.
+
 #### Capture
 ```python
     def capture_photo(self, kwargs):
@@ -478,6 +482,13 @@ The `analyze_imageproxy_callback()` implements a graceful degradation mechanism.
 #### Display Resolution.
 
 Nothing to do with a camera, it is a physical property of a screen. A scalar measured in dpi.
+
+### Latency
+
+Connecting/disconnecting the camera, switching between cameras, and image or video capture all take a finite time; and may occur in their own threads. Preview prioritizes completing image or video capture over disconnecting or switching cameras. In this case the disconnect or camera switch will be slightly delayed.
+
+In the case of a delayed disconnect, it is possible the camera will not be available for an immediate connect - say from a new screen. In this case there is a slight possibility of a white Preview in the new screen. This can be handled in the app, say by delaying exit from this screen until the filepath_callback has occured.   
+
 
 
 ## Camera Provider
