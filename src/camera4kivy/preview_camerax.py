@@ -72,6 +72,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
         self._name_pipe = []
         self.texture_size = []
         self.rotation = 0
+        self.capture_in_progress = False
 
         # uniform case
         self.flash_state = default_flash.lower()
@@ -128,14 +129,25 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
         self._configure_camera(True)
 
     # destroy camera
-    @run_on_ui_thread
     def disconnect_camera(self):
         self._deschedule_pipeline()
         if self._camera:
-            self._camera.unbind_camera()
-            self._camera = None
-        return self.texture_size
-
+            if not self.capture_in_progress:
+                self.do_disconnect_camera()
+            else:
+                self._disconnect_ev = Clock.schedule_interval(
+                    self.can_disconnect_camera, 1 / 30)
+                
+    def can_disconnect_camera(self,dt):
+        if not self.capture_in_progress:
+            self.do_disconnect_camera()
+            Clock.unschedule(self._disconnect_ev)
+            
+    @run_on_ui_thread
+    def do_disconnect_camera(self):
+        self._camera.unbind_camera()
+        self._camera = None
+                
     # configure camera
     def _configure_camera(self, start):
         self.configure_viewport()
@@ -188,6 +200,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
 
     def capture_photo(self, location = '',  subdir = '', name = ''):
         if self._camera:
+            self.capture_in_progress = True
             self._set_location(location)
             subdir = self._default_subdir_android(subdir)
             name = self._default_file_name(name, '.jpg')
@@ -197,6 +210,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
 
     def capture_video(self, location = '', subdir = '', name = ''):
         if self._camera:
+            self.capture_in_progress = True
             self._set_location(location)
             subdir = self._default_subdir_android(subdir)
             name = self._default_file_name(name,'.mp4')
@@ -248,7 +262,6 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
     
 
     # Select back, front camera
-    @run_on_ui_thread
     def select_camera(self, facing):
         facing = facing.lower()
         if self._camera:
@@ -261,9 +274,24 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
                 self.facing = 'front'
             else:
                 self.facing = 'back'
-            self._camera.select_camera(self.facing)
+
+            if not self.capture_in_progress:
+                self.do_select_camera()
+            else:
+                self.stop_capture_video()
+                self._facing_ev = Clock.schedule_interval(
+                    self.can_select_camera, 1 / 30)
         return self.facing
 
+    def can_select_camera(self,dt):
+        if not self.capture_in_progress:
+            self.do_select_camera()
+            Clock.unschedule(self._facing_ev)
+
+    @run_on_ui_thread
+    def do_select_camera(self):
+        self._camera.select_camera(self.facing)
+            
     # Sequence flash : off, on, auto, ...
     def flash(self):
         if self._camera:
@@ -493,8 +521,9 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             if self._name_pipe:
                 file_id = self._name_pipe[0]
                 self._name_pipe = self._name_pipe[1:]
+        self.capture_in_progress = False
         if self.callback:
-            self.callback(file_id)
+            self.callback(str(file_id))
 
     def _analyze_texture(self):
         if not self.enable_data and self._analyze_callback:
