@@ -186,12 +186,12 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
     # CommonGestures Touch Events
     # tap for focus
     def cg_tap(self, touch, x, y):
-        if self.enable_focus_gesture:
+        if self._camera and self.enable_focus_gesture:
             self.focus(x, y)
 
     # pinch/spread for zoom
     def cg_scale(self, touch0, touch1, scale, x, y):
-        if self.enable_zoom_gesture:
+        if self._camera and self.enable_zoom_gesture:
             self.zoom_delta(scale)
 
     ##############################
