@@ -75,6 +75,7 @@ class Preview(AnchorLayout):
         self.analyze_resolution = analyze_pixels_resolution
         self.camera_connected = True
         self._finished = False
+        self._fbo = None
         if enable_analyze_pixels:
             Thread(target=self.image_scheduler, daemon=True).start()
         self.preview.connect_camera(analyze_callback =

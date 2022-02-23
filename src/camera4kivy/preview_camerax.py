@@ -162,8 +162,9 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
 
     # Device Rotate
     def on_size(self, instance, size):
-        self.stop_capture_video()
-        self._configure_camera(False)
+        if self._camera:
+            self.stop_capture_video()
+            self._configure_camera(False)
             
     ##################################
     # Parse options
@@ -263,8 +264,8 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
 
     # Select back, front camera
     def select_camera(self, facing):
-        facing = facing.lower()
         if self._camera:
+            facing = facing.lower()
             if facing == 'toggle':
                 if self.facing == 'back':
                     self.facing = 'front'
@@ -281,7 +282,8 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
                 self.stop_capture_video()
                 self._facing_ev = Clock.schedule_interval(
                     self.can_select_camera, 1 / 30)
-        return self.facing
+            facing = self.facing
+        return facing
 
     def can_select_camera(self,dt):
         if not self.capture_in_progress:
@@ -302,7 +304,8 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             else:
                 self.flash_state = 'off'
             self.flash_state = self._camera.flash(self.flash_state)
-        return self.flash_state
+            return self.flash_state
+        return "off"
 
     # if enable_focus_gesture == True, then this is called by a tap gesture
     def focus(self, x, y):
