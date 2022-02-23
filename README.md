@@ -52,6 +52,8 @@ The captured file location may be specified and is also reported in a callback. 
 
 On Android a pinch/spread gesture controls zoom, and a tap overrides any automatic focus and metering (if available). Some `connect_camera()` options are platform specific.
 
+Be aware Preview operation depends on a physical GPU for adequate frame rate, it is not recommended for devices with a software emulated GPU.
+
 ## Install
 
 A [camera provider](https://github.com/Android-for-Python/camera4kivy#camera-provider) may be required. On a destop the camera provider is installed once. On Android the camera provider is [added to each project](https://github.com/Android-for-Python/camera4kivy#android-camera-provider).
@@ -294,6 +296,8 @@ class CustomAnalyzer(Preview):
       def canvas_instructions_callback(self, texture, tex_size, tex_pos):
 	### Add your Preview annotation or image replacement code here
 ```
+
+The `analyze_pixels_callback()` is called each time new pixels are available, and the `canvas_instructions_callback()` is called on each iteration of the Kivy event loop. The availability of new pixels depends on the camera data rate, and the latency of any analysis code included with the previous call of `analyze_pixels_callback()`. Thus `analyze_pixels_callback()` is typically called at a rate less than `canvas_instructions_callback()`, so the annotation update rate is typically less than the image frame rate.
 
 On Android this is an alternative to analyze_pixels_callback(), it is used for Android only analysis packages.
 ```
