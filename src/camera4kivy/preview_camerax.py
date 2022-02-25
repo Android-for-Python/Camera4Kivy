@@ -129,24 +129,13 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
         self._configure_camera(True)
 
     # destroy camera
+    @run_on_ui_thread
     def disconnect_camera(self):
+        self.stop_capture_video()
         self._deschedule_pipeline()
         if self._camera:
-            if not self.capture_in_progress:
-                self.do_disconnect_camera()
-            else:
-                self._disconnect_ev = Clock.schedule_interval(
-                    self.can_disconnect_camera, 1 / 30)
-                
-    def can_disconnect_camera(self,dt):
-        if not self.capture_in_progress:
-            self.do_disconnect_camera()
-            Clock.unschedule(self._disconnect_ev)
-            
-    @run_on_ui_thread
-    def do_disconnect_camera(self):
-        self._camera.unbind_camera()
-        self._camera = None
+            self._camera.unbind_camera()
+            self._camera = None
                 
     # configure camera
     def _configure_camera(self, start):
@@ -276,6 +265,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             else:
                 self.facing = 'back'
 
+            # may have to wait for a capture to complete
             if not self.capture_in_progress:
                 self.do_select_camera()
             else:
@@ -344,13 +334,6 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             translate = -(long_edge - short_edge) /2
         elif rotation == 270:
             translate = (long_edge - short_edge) /2
-
-        # move to canvas_callback
-        #if self.facing == 'front':
-        #    if rotation == 90 or rotation == 270:
-        #        scaley = -1
-        #    else:
-        #        scalex = -1
 
         if texture_size[0] < texture_size[1]:
             translate = -translate
