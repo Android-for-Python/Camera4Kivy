@@ -107,7 +107,7 @@ On Android `orientation = all` is available, on the desktop you can change the w
 | QR   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | |
 | OpenCV | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | |
 | MLKit | | | | :heavy_check_mark: | | |
-| TFLite   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | :heavy_check_mark: |
+| TFLite   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | :heavy_check_mark: |
 
 - Windows : Windows 11, i7-10 @ 1.1GHz, Python 3.8.2  Kivy==2.1.0.dev0
 - Windows : Windows 10, i3-7 @ 2.4GHz, Python 3.9.7 Kivy==2.0.0
@@ -188,6 +188,8 @@ Overrides the default sensor resolution, which is the highest resolution availab
 ##### analyze_pixels_resolution
 Sets the pixels resolution passed by `analyze_pixels_callback()`. A scalar, representing the number of pixels on the long edge, the short edge is determined using the aspect ratio. For example `analyze_pixels_resolution = 720`. The default is the minimum of cropped sensor resolution and 1024.
 
+As an alternative, sometimes the analysis package will need to set the resolution. This is done with `self.auto_analyze_resolution` as described in [Analyze Configuration](https://github.com/Android-for-Python/camera4kivy#analyze-configuration). 
+
 ##### enable_analyze_pixels
 Use `enable_analyze_pixels = True` to enable the `analyze_pixels_callback()`
 
@@ -207,12 +209,15 @@ Applies only to the Android ImageProxy api. 'yuv420' (default) or 'rgba'.
 
 #### Disconnect Camera
 
-Always do this. It is sometimes critically important to disconnect the camera when it is no longer used.
+Always do this, it is important to disconnect the camera when not in use.
 
 ```python
     def disconnect_camera(self):
 ```
-There may be [latency](https://github.com/Android-for-Python/Camera4Kivy#latency) concequences of disconnecting the camera after initiating a capture and before a filepath_callback.
+
+A disconnect while a capture is in progress generally results in termination of the capture and saving the result as usual.
+
+However on Android a disconnect immediately after a capture has be initiated may prevent the start of the file save and nothing is saved. A warning message is reported by filepath_callback, this may be filtered as shown in [this example](https://github.com/Android-for-Python/c4k_photo_example/blob/main/applayout/toast.py#L15)
 
 #### Capture
 ```python
@@ -421,7 +426,9 @@ To change the default analysis resolution specify the number of pixels in the lo
 
 `connect_camera(enable_analyze_pixels = True, analyze_pixels_resolution = 720)`
 
-The pixels api provides images with the same orientation and aspect ratio as the Preview.
+The `analyze_pixels_resolution` option provides analysis images with the same orientation and aspect ratio as the Preview. 
+
+As an alternative the analysis software may set `self.auto_analyze_resolution` a two element list of [width, height]. In this case the aspect ratio is not necessarily maintained for analysis, the `analyze_pixels_callback()` `image_scale` parameter is a two element list [width, height] allowing scaling of any results. As used in [c4k_tflite_example classifyobject.py](https://github.com/Android-for-Python/c4k_tflite_example/blob/main/classifyobject.py).
 
 On Android only, the imageproxy api is an alternative to the pixels api. 
 
@@ -486,14 +493,6 @@ The `analyze_imageproxy_callback()` implements a graceful degradation mechanism.
 #### Display Resolution.
 
 Nothing to do with a camera, it is a physical property of a screen. A scalar measured in dpi.
-
-### Latency
-
-Connecting/disconnecting the camera, switching between cameras, and image or video capture all take a finite time; and may occur in their own threads. Preview prioritizes completing image or video capture over disconnecting or switching cameras. In this case the disconnect or camera switch will be slightly delayed.
-
-In the case of a delayed disconnect, it is possible the camera will not be available for an immediate connect - say from a new screen. In this case there is a slight possibility of a white Preview in the new screen. This can be handled in the app, say by delaying exit from this screen until the filepath_callback has occured.   
-
-
 
 ## Camera Provider
 
@@ -568,9 +567,9 @@ There is no way to specify inverted letterboxing. Where the Preview exactly fits
 
 It probably will have issues, don't expect it to work.
 
-### Behavior: Raspberry PI video frame rate is lower than other platforms.
+### Behavior: Emulated GPU frame rate is lower than other platforms.
 
-Functional, but with a low frame rate. The issue is probably related to the current picamera implementation, try Gstreamer or OpenCV.
+Devices with an emulated GPU are probably unusably slow.
 
 ### Behavior: Raspberry PI Bullseye not available
 
