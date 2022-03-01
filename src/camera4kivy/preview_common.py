@@ -85,9 +85,6 @@ class PreviewCommon(Widget):
 
         self.view_size = (width_view, height_view)
         self.view_pos  = [self.pos[0] + pos_x, self.pos[1] + pos_y]
-        #if self._camera and self._camera_texture:
-        #    width_tex, height_tex = self._camera_texture.size
-        #    self.tscale = self.view_size[1] / height_tex
 
     def decode_orientation(self):
         orientation = self.orientation
