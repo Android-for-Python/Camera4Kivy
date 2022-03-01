@@ -50,7 +50,7 @@ class Preview(AnchorLayout):
         self._finished = False
         self._image_available = Event()
         self.analyze_resolution = 1024
-        self.analyzer_resolution = []
+        self.auto_analyze_resolution = []
     
     def on_orientation(self,instance,orientation):
         if self.preview and not self.camera_connected:
@@ -127,37 +127,34 @@ class Preview(AnchorLayout):
     def analyze_image_callback_schedule(self, texture, tpos, tscale, mirror):
         # texture : Kivy Texture with same orientation as the Preview
         # tpos   : location of texture in Preview
-        # scale : scale from oriented Texture resolution to Preview resolution
+        # tscale : scale from oriented Texture resolution to Preview resolution
         # mirror : true if preview is mirrored
         if not self._busy:
             self._busy = True
             # Create a texture with lower resolution
-            if self.analyzer_resolution:
-                # DO NOT USE THIS PROTO-FEATURE
+            if self.auto_analyze_resolution:
                 # resolution set by the analyzer [w,h] regardless of
                 # Preview orientation or aspect ratio.
-                # If the aspect ratio is not the same, there will be invisible
-                # letterboxes in the Preview image where analysis does not
-                # occur
-                fbo_size = self.analyzer_resolution
-                fbo_scale = max(texture.width / fbo_size[0],
-                                texture.height / fbo_size[1])
-                fbo_pos = ((texture.width - fbo_size[0] * fbo_scale) / 2,
-                           (texture.height - fbo_size[1] * fbo_scale) / 2)
+                # If the aspect ratio is not the same the Fbo is distorted.
+                # self.scale is a two element array
+                fbo_size = self.auto_analyze_resolution
+                scale = [tscale * texture.width / fbo_size[0],
+                         tscale * texture.height / fbo_size[1]]
             else:
                 # resolution is 'self.analyze_resolution' along the long edge
                 # default value is 1024
                 # Optionally set as a connect option.
                 # Value is never greater that the sensor resolution.
-                # The aspect ratio is always the same as the Preview, thus
-                # the full Preview is analyzed.
+                # The aspect ratio is always the same as the Preview
+                # self.scale is a scalar
                 fbo_scale = max(max(texture.size) / self.analyze_resolution, 1)
                 fbo_size  = (round(texture.size[0]/fbo_scale),
                              round(texture.size[1]/fbo_scale))
-                fbo_pos = (0, 0)
+                scale = tscale * fbo_scale
             origin    = (round(fbo_size[0]/2), round(fbo_size[1]/2))
             # new or resized texture
-            if not self._fbo or self._fbo.size[0] != fbo_size[0]:
+            if not self._fbo or self._fbo.size[0] != fbo_size[0] or\
+               self._fbo.size[1] != fbo_size[1]:
                 self._fbo = Fbo(size = fbo_size)
             self._fbo.clear()
             with self._fbo:
@@ -166,11 +163,13 @@ class Preview(AnchorLayout):
                 Rectangle(texture= texture, size = fbo_size)
             self._fbo.draw()
 
+            # save these for self.analyze_pixels_callback()
             self.pixels = self._fbo.texture.pixels
             self.im_size = self._fbo.texture.size
-            self.tpos = (tpos[0] + fbo_pos[0], tpos[1] + fbo_pos[1])
-            self.scale = tscale * fbo_scale
+            self.scale = scale  # 2 ele list , or scalar
+            self.tpos = tpos
             self.mirror = mirror
+            # ready
             self._image_available.set()
 
     def image_scheduler(self):
