@@ -64,10 +64,9 @@ A [camera provider](https://github.com/Android-for-Python/camera4kivy#camera-pro
 
 ### Install Camera4Kivy on Android
 
-Camera4Kivy depends on the 'master' version of Buildozer. Currently `1.2.0.dev0`
+Camera4Kivy depends on Buildozer 1.3.0 or later
 
-`pip3 install git+https://github.com/kivy/buildozer.git`
-
+`pip3 install buildozer`
 
 #### buildozer.spec:
 
