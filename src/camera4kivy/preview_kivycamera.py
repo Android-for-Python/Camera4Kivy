@@ -1,3 +1,5 @@
+from kivy.app import App
+from kivy.core.window import Window
 from threading import Thread
 from kivy.clock import mainthread
 from kivy.utils import platform
@@ -6,10 +8,16 @@ from kivy.graphics import Rectangle, Color
 from kivy.graphics.texture import Texture
 from kivy.core.text import Label as CoreLabel
 from kivy.metrics import sp
-from camera4kivy.based_on_kivy_core.camera import Camera
+from gestures4kivy import CommonGestures
 from camera4kivy.preview_common import PreviewCommon
+if platform in ['macosx', 'ios']:
+    from kivy.core.camera import Camera
+else:
+    from camera4kivy.based_on_kivy_core.camera import Camera
 
-class PreviewKivyCamera(PreviewCommon):
+from kivy.logger import Logger
+
+class PreviewKivyCamera(PreviewCommon, CommonGestures):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -18,13 +26,27 @@ class PreviewKivyCamera(PreviewCommon):
         self.switching_camera = False
         self.starting_camera = False
         self.abort_camera_start = False
-        
+        self.enable_zoom_gesture = False
+        self.enable_focus_gesture  = False
+        self.cg_zoom_level = [1 , 1]
+        self.window_width = Window.width
+        if platform == 'ios':
+            app = App.get_running_app()
+            app.bind(on_resume = self.on_resume)
+            
     def __del__(self):
         self.disconnect_camera()
+
+    def on_resume(self, arg):
+        Window.update_viewport()
 
     def on_size(self, instance, size):
         self.configure_viewport()
         self.configure_texture_crop(None)
+        if platform == 'ios' and self.window_width != Window.width:
+            if self._camera:
+                orientation = self._camera.get_device_orientation()
+                self._camera.set_video_orientation(orientation)
         self.canvas.clear()
         if self.error_message:
             self.canvas_text(self.error_message)
@@ -34,6 +56,7 @@ class PreviewKivyCamera(PreviewCommon):
             with self.canvas:
                 Color(1,1,1,1)
                 Rectangle(size = self.view_size, pos = self.view_pos)
+        self.window_width = Window.width
 
     #############################################
     # User Events
@@ -43,6 +66,9 @@ class PreviewKivyCamera(PreviewCommon):
                        camera_id = '0',
                        mirrored = True,
                        sensor_resolution = [],
+                       default_zoom = 1.0,
+                       enable_zoom_gesture = True,
+                       enable_focus_gesture = True,                         
                        filepath_callback = None,
                        analyze_callback = None,
                        canvas_callback = None,
@@ -52,7 +78,14 @@ class PreviewKivyCamera(PreviewCommon):
         self.set_filepath_callback(filepath_callback)
         self.data_callback = analyze_callback
         self.canvas_callback = canvas_callback
-        self.mirror = mirrored
+        self.default_zoom = min(max(default_zoom,0),1)
+        self.enable_zoom_gesture = enable_zoom_gesture
+        self.enable_focus_gesture = enable_focus_gesture        
+        self.cg_zoom_level = [self.default_zoom, self.default_zoom]
+        if platform == 'ios':
+            self.mirror = self.index != 0
+        else:
+            self.mirror = mirrored
         self.stop_camera()
         Thread(target=self.start_camera, daemon=True).start()
 
@@ -66,17 +99,28 @@ class PreviewKivyCamera(PreviewCommon):
         if self.switching_camera or self.starting_camera:
             return self.index
         self.switching_camera = True
-        self.stop_camera()
-        self.set_index(index)
-        self.start_camera()
+        if platform == 'ios':
+            if self._camera:
+                self.set_index(index)
+                self.mirror = self.index != 0
+                self._camera.change_camera_input(self.index)
+                self.zoom_abs(self.cg_zoom_level[self.index])                
+        else:
+            self.stop_camera()
+            self.set_index(index)
+            self.start_camera()
         self.switching_camera = False
         return index
 
     def capture_screenshot(self, location = '.', subdir = '', name = ''):
         view_crop = self.screenshot_crop()
-        tex = self.export_as_image().texture.get_region(*view_crop)
         path = self.capture_path(location, subdir, name)
-        tex.save(path, flipped = True)   
+        tex = self.export_as_image().texture.get_region(*view_crop)
+        tex.flip_vertical()
+        if platform == 'ios':
+            self._camera.save_texture(tex, path)
+        else:
+            tex.save(path, flipped = False)   
         if self.callback:
             self.callback(path)
 
@@ -84,10 +128,34 @@ class PreviewKivyCamera(PreviewCommon):
         if self._camera and self._camera.texture:
             path = self.capture_path(location, subdir, name)
             tex = self._camera.texture.get_region(*self.tex_crop)
-            tex.save(path, flipped = False)    
+            if platform == 'ios':
+                self._camera.save_texture(tex, path)
+            else:
+                tex.save(path, flipped = False)    
             if self.callback:
                 self.callback(path)
+
+    ##############################
+    # Preview Widget Touch Events
+    ##############################
+
+    # pinch/spread for zoom
+    def cg_scale(self, touch0, touch1, scale, x, y):
+        if platform == 'ios':
+            if self._camera and self.enable_zoom_gesture:
+                level = max(self.cg_zoom_level[self.index] * scale, 1)
+                self.cg_zoom_level[self.index] = level 
+                self.zoom_abs(level)                
         
+    #############################################
+    # iOS only User Events
+    #############################################
+
+    def zoom_abs(self, level):
+        if platform == 'ios' and self._camera:
+            self._camera.zoom_level(level)
+
+
     #############################################
     # Ignored User Events
     #############################################
@@ -105,9 +173,6 @@ class PreviewKivyCamera(PreviewCommon):
         pass
 
     def zoom_delta(self, delta_scale):
-        pass
-
-    def zoom_abs(self, scale):
         pass
 
     #############################################
@@ -148,7 +213,7 @@ class PreviewKivyCamera(PreviewCommon):
                     # default 16:9
                     self._sensor_resolution = [3840, 2160]
                 else:
-                    # default 4:3 , value ignored by gi
+                    #default 4:3 , value ignored by gi
                     self._sensor_resolution = [6400, 4800]
                 try:
                     import picamera
@@ -237,18 +302,39 @@ class PreviewKivyCamera(PreviewCommon):
         crop_siz_x = width_tex
         crop_siz_y = height_tex   
         if orientation == 'portrait':
-            crop_siz_x = height_tex / aspect
-            crop_pos_x = (width_tex - height_tex / aspect) / 2
-        elif width_tex / height_tex > 1.5:
-            # texture is 16:9
-            if self.aspect_ratio == '4:3':
-                crop_siz_x = height_tex * aspect
-                crop_pos_x = (width_tex - height_tex * aspect) / 2
-        else:
-            # texture is 4:3
-            if self.aspect_ratio == '16:9':
+            if width_tex < height_tex:
+                # Portrait texture
+                if height_tex / width_tex > 1.5:
+                    # texture is 16:9
+                    if self.aspect_ratio == '4:3':
+                        crop_siz_y = width_tex * aspect   #1
+                        crop_pos_y = (height_tex - crop_siz_y) / 2
+                else:
+                    # texture is 4:3
+                    if self.aspect_ratio == '16:9':
+                        crop_siz_x = height_tex / aspect
+                        crop_pos_x = (width_tex - crop_siz_x) / 2
+            else:
+                # Landscape texture
+                crop_siz_x = height_tex / aspect
+                crop_pos_x = (width_tex - crop_siz_x) / 2
+        else: # Landscape
+            if width_tex < height_tex:
+                # Portrait texture
                 crop_siz_y = width_tex / aspect
-                crop_pos_y = (height_tex - width_tex / aspect) / 2
+                crop_pos_y = (width_tex - crop_siz_y) / 2
+            else:
+                # Landscape texture
+                if width_tex / height_tex > 1.5:
+                    # texture is 16:9
+                    if self.aspect_ratio == '4:3':
+                        crop_siz_x = height_tex * aspect
+                        crop_pos_x = (width_tex - crop_siz_x) / 2
+                else:
+                    # texture is 4:3
+                    if self.aspect_ratio == '16:9':
+                        crop_siz_y = width_tex / aspect
+                        crop_pos_y = (height_tex - crop_siz_y) / 2
 
         self.tex_crop = [ crop_pos_x, crop_pos_y, crop_siz_x, crop_siz_y]
         self.tscale = self.view_size[1] / crop_siz_y 

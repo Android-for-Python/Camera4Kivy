@@ -116,6 +116,13 @@ class PreviewCommon(Widget):
     #############################################
 
     def capture_path(self,location, subdir ,name):
+        if platform == 'ios':
+            storage = location.lower()
+            if storage not in ['private', 'shared']:
+                storage = 'shared'
+            if storage == 'shared':
+                return ''
+            location = self._camera.get_app_documents_directory()  
         return join(self._default_subdir(location, subdir),
                     self._default_file_name(name))
     
@@ -136,3 +143,4 @@ class PreviewCommon(Widget):
         else:
             name = datetime.now().strftime("%H_%M_%S_%f")[:-4]
         return name + ext            
+

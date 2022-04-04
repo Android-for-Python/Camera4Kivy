@@ -43,8 +43,12 @@ if api_version >= 29:
             
 class PreviewCameraX(PreviewCommon, CommonGestures):
 
-    _camera = None
-
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._camera = None
+        self.enable_zoom_gesture = False
+        self.enable_focus_gesture  = False
+    
     ##############################
     # Lifecycle events
     ##############################
