@@ -46,7 +46,8 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         if platform == 'ios' and self.window_width != Window.width:
             if self._camera:
                 orientation = self._camera.get_device_orientation()
-                self._camera.set_video_orientation(orientation)
+                if orientation in [1,2,3,4]:
+                    self._camera.set_video_orientation(orientation)
         self.canvas.clear()
         if self.error_message:
             self.canvas_text(self.error_message)
