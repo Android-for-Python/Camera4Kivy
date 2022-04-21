@@ -10,7 +10,7 @@ On Android only:
 
 ## Overview
 
-Available on all the usual platforms except iOS.
+Available on all the usual platforms.
 
 ```python
 from camera4kivy import Preview
@@ -92,11 +92,11 @@ Required when capturing photo, screenshot, or video and saving to shared storage
 
 ### Install Camera4Kivy on iOS
 
-`toolchain pip install camera4kivy`
+`toolchain pip3 install camera4kivy`
 
 #### Run Time Permissions
 
-Permission to use the camera and save images is **required** by iOS. To enable permissions edit `<project>-ios/<project-Info.plist`, this file is created by Xcode. Add some or all of these:
+Permission to use the camera and save images is **required** by iOS. To enable permissions edit `<project>-ios/<project-Info.plist`. Add some or all of these:
 
 To enable use of the Camera add:
 ```
