@@ -52,7 +52,7 @@ The captured file location may be specified and is also reported in a callback. 
 
 On Android a pinch/spread gesture controls zoom, and a tap overrides any automatic focus and metering (if available). Some `connect_camera()` options are platform specific.
 
-Be aware Preview operation depends on a physical GPU for adequate frame rate, it is not recommended for devices with a software emulated GPU.
+Be aware Preview operation depends on the performance of the graphics hardware. In general Preview uses the highest available resolution. On devices with low performance graphics hardware sush as low end laptops or Raspberry, you will probably have to explicitly set a lower image resolution inorder to increase the frame rate.
 
 ## Install
 
@@ -90,6 +90,33 @@ Required to record video with audio: `RECORD_AUDIO`
 
 Required when capturing photo, screenshot, or video and saving to shared storage, and only on devices running api_version < 29: `WRITE_EXTERNAL_STORAGE`
 
+### Install Camera4Kivy on iOS
+
+`toolchain pip install camera4kivy`
+
+#### Run Time Permissions
+
+Permission to use the camera and save images is **required** by iOS. To enable permissions edit `<project>-ios/<project-Info.plist`, this file is created by Xcode. Add some or all of these:
+
+To enable use of the Camera add:
+```
+        <key>NSCameraUsageDescription</key>
+	<string> </string>
+```
+To enable saving image captures to the Photos App (the default behavior) add:
+```
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string> </string>
+```
+To enable viewing images saved to app local storage with the File Manager:
+```
+        <key>UIFileSharingEnabled</key>
+	<true/>
+        <key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+```
+
+
 ## Examples
 
 A prerequisite is that a working camera is installed. Test this with the platform's camera app before proceeding. All examples use the platform specific camera provider, and assume the typical default camera_id of '0'. If you find the example does not connect to a camera review the available camera ids and your camera provider choice.
@@ -102,7 +129,7 @@ On Android `orientation = all` is available, on the desktop you can change the w
 
 | Example | Windows | Macos | Linux | Android | iOS | Coral |
 |---------|---------|-------|-------|---------|-----|-------|
-| Photo   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | |
+| Photo   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | |
 | QR   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | |
 | OpenCV | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | |
 | MLKit | | | | :heavy_check_mark: | | |
@@ -114,7 +141,7 @@ On Android `orientation = all` is available, on the desktop you can change the w
 - Linux   : Raspberry Buster, Cortex-A72 @ 1.5GHz Python3.7.3 Kivy==2.0.0
 - Android : build : arm64-v8a  device: Android 12, Pixel 5
 - Android : build : armeabi-v7a device: Android 6, Nexus 5  Start is somewhat slow.
-- iOS     : not tested
+- iOS     : iPhone SE (second generation)
 - Coral   : [Accelerator](https://coral.ai/products/accelerator) tested with Windows 11 , gave very approximately an order of magnitude speed up.
 
 ### [C4K-Photo-Example](https://github.com/Android-for-Python/c4k_photo_example)
@@ -165,10 +192,10 @@ This may only be called after `on_start()`.
 Optional arguments:
     
 ##### camera_id
-Specify which camera to connect to. For example `camera_id = 'front'`. A string containing an integer (default '0'), or on Android 'back' (default), or 'front'.
+Specify which camera to connect to. For example `camera_id = 'front'`. A string containing an integer (default '0'), or on Android or iOS 'back' (default), or 'front'.
 
 ##### mirrored
-Mirrors the Preview image, default is `True`. This option is ignored on Android where by convention 'front' is always mirrored and 'back' is never mirrored. This option should usually be `True` for any camera facing the user, and `False` for any camera not facing the user. 
+Mirrors the Preview image, default is `True`. This option is ignored on Android and iOS where by convention 'front' is always mirrored and 'back' is never mirrored. This option should usually be `True` for any camera facing the user, and `False` for any camera not facing the user. 
 
 Captures are never mirrored, except a screenshot capture if the Preview is mirrored.
 
@@ -197,7 +224,7 @@ Use `enable_analyze_imageproxy = True` to enable the `analyze_imageproxy_callbac
 Android only.
 
 ##### enable_zoom_gesture
-Default True.  Android only.
+Default True.  Android and iOS only.
 
 ##### enable_focus_gesture
 Default True. Android only.
@@ -230,7 +257,7 @@ Captures are never mirrored, except a screenshot capture if the Preview is mirro
 
 Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`. 
 
-The default values are as follows. On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`. The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'. The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
+The default values are as follows. On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`, and on iOS <location> is the Photos App. The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'. The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
 
 The [filepath_callback](https://github.com/Android-for-Python/Camera4Kivy#filepath_callback) occurs on capture completion, with an argument that is the actual path for a particular capture. 
 
@@ -244,17 +271,24 @@ The value replaces the default value of `<location>`.
 
 On a desktop the value is a directory that must exist. 
 
-On Android the value can only be `'shared'` or `'private'`, other values default to `'shared'`. The value `'shared'` specifies Android shared storage `DCIM/<appname>`. The value `'private'` specifies [app local storage](https://github.com/kivy/python-for-android/blob/develop/doc/source/apis.rst#storage-paths) `app_storage_path()/DCIM`. If you want a different location use `'private'` and move the resulting file based on the path provided by filepath_callback.
+On Android and iOS the value can only be `'shared'` or `'private'`, other values default to `'shared'`.
+
+On Android the value `'shared'` specifies Android shared storage `DCIM/<appname>`. The value `'private'` specifies [app local storage](https://github.com/kivy/python-for-android/blob/develop/doc/source/apis.rst#storage-paths) `app_storage_path()/DCIM`. If you want a different location use `'private'` and move the resulting file based on the path provided by filepath_callback.
+
+On iOS the value `'shared'` specifies the iOS Photos App. The value `'private'` specifies app local storage. For `'shared'` the filepath_callback returns an empty string, for `'private'` it returns the paths to the file in app local storage.
+
 
 ##### subdir
 
-The value replaces the default value of `<subdir>`. The subdirectory will be created or added to the Android MediaStore path.
+The value replaces the default value of `<subdir>`. The subdirectory will be created or added to the Android MediaStore path. For iOS when `location='shared'` this is ignored.
 
 ##### name
 
 The value replaces the default value of `<name>`, the `.jpg` or `.mp4` extensions will be added automatically.
 
 Note that it is a characteristic of Android MediaStore that a second capture with the same subdir and name values as the first will not overwrite the first. It will create a second file named `<subdir>/<name> (1).jpg`, this name is created by Android MediaStore. The MediaStore may crash if it creates too many (31 ?) such names.
+
+For iOS when `location='shared'` this is ignored.
 
 #### Select Camera
 
@@ -265,7 +299,8 @@ Change the currently connected camera, camera_id must specify a physically conne
 ```
 
 #### Zoom
-Android only, zoom_delta() called by pinch/spread gesture unless disabled.
+On Android only, zoom_delta() is called by pinch/spread gesture unless disabled.
+On iOS only, zoom_abs() is called by pinch/spread gesture unless disabled.
 ```python 
     def zoom_delta(self, delta_scale):  
     def zoom_abs(self, scale):  
