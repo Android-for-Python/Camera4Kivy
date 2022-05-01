@@ -92,6 +92,12 @@ Required when capturing photo, screenshot, or video and saving to shared storage
 
 ### Install Camera4Kivy on iOS
 
+Install the 'master' (2022/04/22 or later) version of kivy-ios.
+```
+pip3 install git+https://kivy/kivy-ios.git
+toolchain build python3 kivy
+```
+
 `toolchain pip3 install camera4kivy`
 
 #### Run Time Permissions
@@ -123,9 +129,9 @@ A prerequisite is that a working camera is installed. Test this with the platfor
 
 ### Tested Examples and Platforms 
 
-The Photo example illustrates basic camera usage, try this first. The remaining examples illustrate image analysis using various packages. Not tested : iOS, set your expectations accordingly.
+The Photo example illustrates basic camera usage, try this first. The remaining examples illustrate image analysis using various packages. 
 
-On Android `orientation = all` is available, on the desktop you can change the window size to simulate orientation, and thus rotating a mobile device. 
+On Android and iOS the app can rotate when the device rotates, on the desktop you can change the window size to simulate orientation, and thus rotating a mobile device. 
 
 | Example | Windows | Macos | Linux | Android | iOS | Coral |
 |---------|---------|-------|-------|---------|-----|-------|
