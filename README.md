@@ -491,7 +491,8 @@ The api has a builtin mechanism so that images are analyzed only when the previo
 Conversely, you can explicitly decrease the analysis frame rate without changing anything else using a flag set using Kivy Clock. Clock rates close to the actual analyze rate will exhibit jitter. For example for a one second analyze interval:
 
 ```python
-    Clock.schedule_interval(self.analyze_filter,60)
+        self.enable_analyze_frame = True
+        Clock.schedule_interval(self.analyze_filter,60)
                                                       
     def analyze_filter(self, dt):
         self.enable_analyze_frame = True
@@ -500,7 +501,7 @@ Conversely, you can explicitly decrease the analysis frame rate without changing
                                 scale, mirror):
 	if self.enable_analyze_frame:
 	    self.enable_analyze_frame = False
-	    # add usual analyse code inside if block
+	    # place usual analyse code inside this if block
 ```
 One could modify this in various ways, for example a single sample after some delay.
 
