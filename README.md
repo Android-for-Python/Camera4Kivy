@@ -3,7 +3,7 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
-This document has these sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior), [Camera Provider](https://github.com/Android-for-Python/camera4kivy#camera-provider), and [Known Behavior](https://github.com/Android-for-Python/camera4kivy#known-behaviors).
+This document has these sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior), [Camera Provider](https://github.com/Android-for-Python/camera4kivy#camera-provider), and [Known Behavior](https://github.com/Android-for-Python/camera4kivy#known-behavior).
 
 On Android only:
 - Do not [install an arm7 build on an arm8 device](#behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device).
@@ -26,7 +26,7 @@ In .kv
 ```
 
 In Python
-```
+```python
     self.preview = Preview(aspect_ratio = '16:9')
 ```
 
@@ -345,7 +345,7 @@ class CustomAnalyzer(Preview):
 The `analyze_pixels_callback()` is called each time new pixels are available, and the `canvas_instructions_callback()` is called on each iteration of the Kivy event loop. The availability of new pixels depends on the camera data rate, and the latency of any analysis code included with the previous call of `analyze_pixels_callback()`. Thus `analyze_pixels_callback()` is typically called at a rate less than `canvas_instructions_callback()`, so the annotation update rate is typically less than the image frame rate.
 
 On Android this is an alternative to analyze_pixels_callback(), it is used for Android only analysis packages.
-```
+```python
       def analyze_imageproxy_callback(self, image_proxy, image_pos,
                                       image_scale, mirror, degrees):
 	### Add your imageproxy specific analysis code here
@@ -488,6 +488,22 @@ The camera provides a stream of images for analysis via `analyze_pixels_callback
 
 The api has a builtin mechanism so that images are analyzed only when the previous analysis is complete. This mechanism does not alter the canvas instructions frame rate. If the analysis results are 'jerky' it is because the analysis algorithm is slow for the hardware.
 
+Conversely, you can explicitly decrease the analysis frame rate without changing anything else using a flag set using Kivy Clock. Clock rates close to the actual analyze rate will exhibit jitter. For example for a one second analyze interval:
+
+```python
+    Clock.schedule_interval(self.analyze_filter,60)
+                                                      
+    def analyze_filter(self, dt):
+        self.enable_analyze_frame = True
+
+    def analyze_pixels_callback(self, pixels, image_size, image_pos,
+                                scale, mirror):
+	if self.enable_analyze_frame:
+	    self.enable_analyze_frame = False
+	    # add usual analyse code inside if block
+```
+One could modify this in various ways, for example a single sample after some delay.
+
 One way to improve performance is to reduce the `analyze_pixels_resolution` as shown above. This option may alter the qualitative behavior, perhaps because of resolution bias in some third party analyzers. Experiment, some analysis code will work well at much less than VGA resolution. 
 
 The analysis code must be lean. So for example Keras is a complete development environment, a whole bunch of stuff you don't need to run an inference. Port the application to Tensorflow Lite, then use the tflite-runtime not the full Tensorflow Lite.
@@ -599,17 +615,9 @@ Pre-installed
 
 ## Known Behavior
 
-### Behavior: Preview has no aspect_ratio = 'fit'
+### Behavior: Preview has no aspect_ratio = 'fill'
 
-There is no way to specify inverted letterboxing. Where the Preview exactly fits the space available, resulting in one axis of the captured image being partially shown to the user.
-
-### Behavior: iOS implementation is not tested.
-
-It probably will have issues, don't expect it to work.
-
-### Behavior: Emulated GPU frame rate is lower than other platforms.
-
-Devices with an emulated GPU are probably unusably slow.
+There is no way to specify inverted letterboxing. Where the Preview exactly fills the space available, resulting in one axis of the captured or analyzed image being partially hidden in the Preview. 
 
 ### Behavior: Raspberry PI Bullseye not available
 
@@ -625,7 +633,7 @@ Video file orientation is incorrect if the preview orientation is not the same a
 
 ### Behavior: Android .jpg Orientation.
 
-Some third party image viewers will incorrectly display a .jpg as rotated by 90 degrees. This occurs if the capture preview orientation is not the same as the device orientation, and the third party viewer does not use the Exif metadata.   
+Some image viewers (including Kivy Image widget) will incorrectly display a .jpg as rotated by 90 degrees. This occurs if the capture preview orientation is not the same as the device orientation, and the third party viewer does not use the Exif metadata.   
 
 ### Behavior: Android connect_camera during on_start()
 
@@ -640,5 +648,11 @@ When switching cameras there may be a short duration inverted image, this is mor
 
 The implementation of Google's camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device. To rin on an arm64-v8a device you **must** build for arm64-v8a.
 
+### Behavior: Android "No supported surface combination"
 
+`No supported surface combination is found for camera device - Id : 0.  May be attempting to bind too many use cases.`
+
+On very low end Android devices the camera may have limited hardware resources. So far only one device has exhibited this issue. By default c4k configures connect_camera() for either 'photo and video` or 'photo and image analysis' - this keeps the api as simple as possible. But in this case it is too expensive for the hardware. We can override these configurations.
+
+If the connection is only used for photo use `connect_camera(enable_video = False, ...other options..)`. If the connection is only used for video or data analysis use `connect_camera(enable_photo = False, ...other options..)`. 
 
