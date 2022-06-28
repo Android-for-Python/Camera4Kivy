@@ -492,7 +492,7 @@ Conversely, you can explicitly decrease the analysis frame rate without changing
 
 ```python
         self.enable_analyze_frame = True
-        Clock.schedule_interval(self.analyze_filter,60)
+        Clock.schedule_interval(self.analyze_filter,1)
                                                       
     def analyze_filter(self, dt):
         self.enable_analyze_frame = True
