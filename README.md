@@ -259,6 +259,8 @@ However on Android a disconnect immediately after a capture has be initiated may
     def stop_capture_video(self):         # Android only
 ```
 
+Video capture is only available on Android.
+
 Captures are never mirrored, except a screenshot capture if the Preview is mirrored. Capture resolution is discussed [here](https://github.com/Android-for-Python/Camera4Kivy#capture-resolution).
 
 Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`. 
