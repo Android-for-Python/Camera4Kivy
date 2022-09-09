@@ -31,12 +31,16 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         self.cg_zoom_level = [1 , 1]
         self.window_width = Window.width
         if platform == 'ios':
-            app = App.get_running_app()
-            app.bind(on_resume = self.on_resume)
+            self._enable_on_resume()
             
     def __del__(self):
         self.disconnect_camera()
 
+    @mainthread
+    def _enable_on_resume(self):
+        app = App.get_running_app()
+        app.bind(on_resume = self.on_resume)
+            
     def on_resume(self, arg):
         Window.update_viewport()
 
