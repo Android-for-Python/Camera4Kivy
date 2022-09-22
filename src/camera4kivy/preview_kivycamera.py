@@ -145,7 +145,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
     ##############################
 
     # pinch/spread for zoom
-    def cg_scale(self, touch0, touch1, scale, x, y):
+    def cgb_zoom(self, touch0, touch1, x, y, scale):
         if platform == 'ios':
             if self._camera and self.enable_zoom_gesture:
                 level = max(self.cg_zoom_level[self.index] * scale, 1)
