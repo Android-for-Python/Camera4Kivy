@@ -168,7 +168,7 @@ Object classification. Illustrates using a large Tensorflow Lite model, and writ
 
 ## Preview Widget
 
-An app can have multiple `Preview` widgets, but only one can be connected to the physical camera unit at a time. A natural way to implement this is to add a preview widget to a screen's contents, then connect to the camera unit `on_enter` and disconnect `on_pre_leave`. The C4K-Photo-Example illustrates this, the other examples simply connect the camera after `on_start()` and disconnect `on_stop()`.
+An app can have multiple `Preview` widgets, but only one can be connected to the physical camera unit at a time. A natural way to implement this is to add a preview widget to a screen's contents, then connect to the camera unit `on_enter` and disconnect `on_pre_leave`. Or if using a ModalView, Popup, or MDDialog use `on_open` and `on_pre_dismiss`. The C4K-Photo-Example illustrates this, the other examples simply connect the camera after `on_start()` and disconnect `on_stop()`.
 
 ### Preview Widget Properties
 
