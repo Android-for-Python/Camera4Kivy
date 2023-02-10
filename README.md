@@ -3,7 +3,7 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
- 
+2023/02/09 : Android users: camerax_provider has been updated to version 0.0.3 
 
 - [Overview](#overview)
 - [Install](#install)
@@ -668,6 +668,14 @@ from kivy import kivy_options
 providers= list(kivy_options['camera'])
 providers.remove('picamera')
 kivy_options['camera'] = tuple(providers)
+```
+
+You can read back the chosen camera provider with:
+
+```python
+from camera4kivy import CameraProviderInfo
+
+    provider_string = CameraProviderInfo().get_name()
 ```
 
 ### Android Camera Provider
