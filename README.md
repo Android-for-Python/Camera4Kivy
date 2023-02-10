@@ -706,7 +706,7 @@ Depends on the Linux flavor, but commonly:
 Pre-installed
 
 ### Picamera2
-[Raspberry PI Bullseye not available](https://github.com/Android-for-Python/camera4kivy#behavior-raspberry-pi-bullseye-not-available).
+Raspberry PI Bullseye support currently not available.
 
 ### AVFoundation
 Pre-installed
