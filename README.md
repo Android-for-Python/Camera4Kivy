@@ -3,10 +3,80 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
-This document has these sections [Overview](https://github.com/Android-for-Python/camera4kivy#overview), [Install](https://github.com/Android-for-Python/camera4kivy#install), [Examples](https://github.com/Android-for-Python/camera4kivy#examples), [Preview Widget](https://github.com/Android-for-Python/camera4kivy#preview-widget), [Image Analysis](https://github.com/Android-for-Python/camera4kivy#image-analysis), [Camera Behavior](https://github.com/Android-for-Python/camera4kivy#camera-behavior), [Camera Provider](https://github.com/Android-for-Python/camera4kivy#camera-provider), and [Known Behavior](https://github.com/Android-for-Python/camera4kivy#known-behavior).
+ 
 
-On Android only:
-- Do not [install an arm7 build on an arm8 device](#behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device).
+- [Overview](#overview)
+- [Install](#install)
+  * [Install Camera4Kivy on Desktop](#install-camera4kivy-on-desktop)
+  * [Install Camera4Kivy on Android](#install-camera4kivy-on-android)
+    + [buildozer.spec:](#buildozerspec-)
+    + [Run Time Permissions](#run-time-permissions)
+  * [Install Camera4Kivy on iOS](#install-camera4kivy-on-ios)
+    + [Run Time Permissions](#run-time-permissions-1)
+- [Examples](#examples)
+  * [Tested Examples](#tested-examples)
+    + [[C4K-Photo-Example](https://github.com/Android-for-Python/c4k_photo_example)](#-c4k-photo-example--https---githubcom-android-for-python-c4k-photo-example-)
+    + [[C4K-QR-Example](https://github.com/Android-for-Python/c4k_qr_example)](#-c4k-qr-example--https---githubcom-android-for-python-c4k-qr-example-)
+    + [[C4K-OpenCV-Example.](https://github.com/Android-for-Python/c4k_opencv_example)](#-c4k-opencv-example--https---githubcom-android-for-python-c4k-opencv-example-)
+    + [[C4K-MLKit-Example](https://github.com/Android-for-Python/c4k_mlkit_example)](#-c4k-mlkit-example--https---githubcom-android-for-python-c4k-mlkit-example-)
+    + [[C4K-TFLite-Example](https://github.com/Android-for-Python/c4k_tflite_example)](#-c4k-tflite-example--https---githubcom-android-for-python-c4k-tflite-example-)
+  * [Tested Platforms](#tested-platforms)
+- [Preview Widget](#preview-widget)
+  * [Preview Widget Properties](#preview-widget-properties)
+    + [aspect_ratio](#aspect-ratio)
+    + [letterbox_color](#letterbox-color)
+    + [orientation](#orientation)
+  * [Preview Widget API](#preview-widget-api)
+    + [Connect Camera](#connect-camera)
+      - [camera_id](#camera-id)
+      - [mirrored](#mirrored)
+      - [filepath_callback](#filepath-callback)
+      - [sensor_resolution](#sensor-resolution)
+      - [analyze_pixels_resolution](#analyze-pixels-resolution)
+      - [enable_analyze_pixels](#enable-analyze-pixels)
+      - [enable_analyze_imageproxy](#enable-analyze-imageproxy)
+      - [enable_zoom_gesture](#enable-zoom-gesture)
+      - [enable_focus_gesture](#enable-focus-gesture)
+      - [imageproxy_data_format:](#imageproxy-data-format-)
+    + [Disconnect Camera](#disconnect-camera)
+    + [Capture](#capture)
+      - [location](#location)
+      - [subdir](#subdir)
+      - [name](#name)
+    + [Select Camera](#select-camera)
+    + [Zoom](#zoom)
+    + [Flash](#flash)
+    + [Torch](#torch)
+    + [Focus](#focus)
+    + [camera_connected](#camera-connected)
+- [Image analysis](#image-analysis)
+  * [Overview and Examples](#overview-and-examples)
+  * [User Interaction](#user-interaction)
+  * [Coordinates and image encoding](#coordinates-and-image-encoding)
+  * [Analysis Configuration](#analysis-configuration)
+  * [Debugging](#debugging)
+  * [Performance](#performance)
+- [Camera Behavior](#camera-behavior)
+  * [A Physical Camera](#a-physical-camera)
+  * [Resolution](#resolution)
+    + [Sensor Resolution](#sensor-resolution)
+    + [Cropped Sensor Resolution](#cropped-sensor-resolution)
+    + [Preview Resolution](#preview-resolution)
+    + [Capture Resolution](#capture-resolution)
+    + [Analysis Resolution](#analysis-resolution)
+    + [Display Resolution.](#display-resolution)
+- [Camera Provider](#camera-provider)
+  * [Android Camera Provider](#android-camera-provider)
+  * [OpenCV](#opencv)
+  * [GStreamer](#gstreamer)
+  * [Picamera](#picamera)
+  * [Picamera2](#picamera2)
+  * [AVFoundation](#avfoundation)
+- [Known Behavior](#known-behavior)
+  * [Behavior: Android .mp4 Orientation](#behavior--android-mp4-orientation)
+  * [Behavior: Android .jpg Orientation.](#behavior--android-jpg-orientation)
+  * [Behavior: Android armeabi-v7a build installed on an arm64-v8a device](#behavior--android-armeabi-v7a-build-installed-on-an-arm64-v8a-device)
+  * [Behavior: Android "No supported surface combination"](#behavior--android--no-supported-surface-combination-)
 
 ## Overview
 
@@ -52,7 +122,7 @@ The captured file location may be specified and is also reported in a callback. 
 
 On Android a pinch/spread gesture controls zoom, and a tap overrides any automatic focus and metering (if available). Some `connect_camera()` options are platform specific.
 
-Be aware Preview operation depends on the performance of the graphics hardware. In general Preview uses the highest available resolution. On devices with low performance graphics hardware sush as low end laptops or Raspberry, you will probably have to explicitly set a lower image resolution inorder to increase the frame rate.
+Be aware Preview operation depends on the performance of the graphics hardware. In general Preview uses the highest available resolution for 30fps performance. On devices with low performance graphics hardware sush as low end laptops or Raspberry, you will probably have to explicitly set a lower image resolution inorder to increase the frame rate.
 
 ## Install
 
@@ -66,11 +136,9 @@ A [camera provider](https://github.com/Android-for-Python/camera4kivy#camera-pro
 
 Camera4Kivy depends on Buildozer 1.3.0 or later
 
-`pip3 install buildozer`
-
 #### buildozer.spec:
 
-`android.api = 30`   (or higher, min 29)
+`android.api = 33` (Constrained by Android packages imported by camerax_provider)
 
 `requirements = python3, kivy, camera4kivy, gestures4kivy`
 
@@ -127,11 +195,29 @@ To enable viewing images saved to app local storage with the File Manager:
 
 A prerequisite is that a working camera is installed. Test this with the platform's camera app before proceeding. All examples use the platform specific camera provider, and assume the typical default camera_id of '0'. If you find the example does not connect to a camera review the available camera ids and your camera provider choice.
 
-### Tested Examples and Platforms 
+### Tested Examples
 
 The Photo example illustrates basic camera usage, try this first. The remaining examples illustrate image analysis using various packages. 
 
 On Android and iOS the app can rotate when the device rotates, on the desktop you can change the window size to simulate orientation, and thus rotating a mobile device. 
+
+#### [C4K-Photo-Example](https://github.com/Android-for-Python/c4k_photo_example)
+Illustrates basic layout using screens. Basic camera functionality including photo capture, screenshot capture, and on Android capture of video with audio.
+On Raspberry PI a mouse must be used, a touch pad does not work correctly.
+
+#### [C4K-QR-Example](https://github.com/Android-for-Python/c4k_qr_example)
+Everything you need to read a restaurant menu. Long press or double click on a highlighted QR code to open a web browser. Illustrates basic analysis, screen annotation, and user interaction. 
+
+#### [C4K-OpenCV-Example.](https://github.com/Android-for-Python/c4k_opencv_example)
+Edge detect the video stream. Illustrates using OpenCV analysis and replacing the original preview with the transformed image.
+
+#### [C4K-MLKit-Example](https://github.com/Android-for-Python/c4k_mlkit_example)
+Face detect, MLKit is Android only. Illustrates using the ImageProxy api.
+
+#### [C4K-TFLite-Example](https://github.com/Android-for-Python/c4k_tflite_example)
+Object classification. Illustrates using a large Tensorflow Lite model, and writing text to the Preview image.
+
+### Tested Platforms 
 
 | Example | Windows | Macos | Linux | Android | iOS | Coral |
 |---------|---------|-------|-------|---------|-----|-------|
@@ -149,22 +235,6 @@ On Android and iOS the app can rotate when the device rotates, on the desktop yo
 - Android : build : armeabi-v7a device: Android 6, Nexus 5  Start is somewhat slow.
 - iOS     : iPhone SE (second generation)
 - Coral   : [Accelerator](https://coral.ai/products/accelerator) tested with Windows 11 , gave very approximately an order of magnitude speed up.
-
-### [C4K-Photo-Example](https://github.com/Android-for-Python/c4k_photo_example)
-Illustrates basic layout using screens. Basic camera functionality including photo capture, screenshot capture, and on Android capture of video with audio.
-On Raspberry PI a mouse must be used, a touch pad does not work correctly.
-
-### [C4K-QR-Example](https://github.com/Android-for-Python/c4k_qr_example)
-Everything you need to read a restaurant menu. Long press or double click on a highlighted QR code to open a web browser. Illustrates basic analysis, screen annotation, and user interaction. 
-
-### [C4K-OpenCV-Example.](https://github.com/Android-for-Python/c4k_opencv_example)
-Edge detect the video stream. Illustrates using OpenCV analysis and replacing the original preview with the transformed image.
-
-### [C4K-MLKit-Example](https://github.com/Android-for-Python/c4k_mlkit_example)
-Face detect, MLKit is Android only. Illustrates using the ImageProxy api.
-
-### [C4K-TFLite-Example](https://github.com/Android-for-Python/c4k_tflite_example)
-Object classification. Illustrates using a large Tensorflow Lite model, and writing text to the Preview image.
 
 ## Preview Widget
 
@@ -259,7 +329,7 @@ However on Android a disconnect immediately after a capture has be initiated may
     def stop_capture_video(self):         # Android only
 ```
 
-Video capture is only available on Android.
+Video capture is only available on Android or with the OpenCV camera provider. Capturing audio with video is only available on Android.
 
 Captures are never mirrored, except a screenshot capture if the Preview is mirrored. Capture resolution is discussed [here](https://github.com/Android-for-Python/Camera4Kivy#capture-resolution).
 
@@ -315,10 +385,17 @@ On iOS only, zoom_abs() is called by pinch/spread gesture unless disabled.
 ```
 
 #### Flash
-Android only. For capture photo only, ignored for video and data.
-Sequence flash : off, on, auto (default), 
+Android only, and for capture photo only, the value is ignored for video and data. The `state` argument must be in `['on', 'auto', 'off']`, alternatively if `state=None` sequential calls sequence through that list. Note that 'on' always turns on the flash around the time a photo is captured, 'auto' only does this if the light level is low enough.
+
 ```python 
-    def flash(self)
+    def flash(self, state = None)
+```
+
+#### Torch
+Android only, immediately turns the flash on in any use case. The `state` argument must be in `['on', 'off']`
+
+```python 
+    def flash(self, state)
 ```
 
 #### Focus
@@ -326,6 +403,10 @@ Android only, if available on device. Called by a tap gesture unless disabled
 ```python
     def focus(x, y): 
 ```
+
+#### camera_connected
+
+This is a boolean variable describing the camera state. It is `True` immediatedal *after* the camera is connected, and `False` immediately *before* the camera is disconnected.
 
 ## Image analysis
 
@@ -390,10 +471,14 @@ Analysis and canvas annotation callbacks occur on different threads. The result 
 ```python
     @mainthread
     def make_thread_safe(self, found):
-        self.annotations = found
+        if self.camera_connected:
+            self.annotations = found
+        else:
+            self.annotations = []
 ```
+Note that we null the application state when the camera is not connected. This prevents saved annotations from being shown when a camera is re-connected, due to the multi-threaded implementation. 
 
-And add the thread safe annotations to the canvas. 
+Then add the thread safe annotations to the canvas. 
 
 ```python
     def canvas_instructions_callback(self, texture, tex_size, tex_pos):
@@ -618,18 +703,6 @@ Pre-installed
 
 ## Known Behavior
 
-### Behavior: Preview has no aspect_ratio = 'fill'
-
-There is no way to specify inverted letterboxing. Where the Preview exactly fills the space available, resulting in one axis of the captured or analyzed image being partially hidden in the Preview. 
-
-### Behavior: Raspberry PI Bullseye not available
-
-The RaspberryPI video stack changed with Bullseye. In Bullseye currently the only working camera source is `libcamera`. Picamera is not availible, [apparently](https://www.raspberrypi.com/news/bullseye-camera-system/) a RPI Picamera2 Python interface is in development. And `libcamera` is not compatible with OpenCV or Kivy's GStreamer implementation. 
-
-### Behavior: Android Rotation
-
-Rotating the physical device through 'inverted portrait' may result in an 'inverted landscape' display. An additional rotation to 'portrait' and back to 'landscape' corrects the display. 
-
 ### Behavior: Android .mp4 Orientation
 
 Video file orientation is incorrect if the preview orientation is not the same as the device orientation. Do not use this layout configuration when recording video. [Google issue tracker](https://issuetracker.google.com/issues/201085351).
@@ -638,18 +711,9 @@ Video file orientation is incorrect if the preview orientation is not the same a
 
 Some image viewers (including Kivy Image widget) will incorrectly display a .jpg as rotated by 90 degrees. This occurs if the capture preview orientation is not the same as the device orientation, and the third party viewer does not use the Exif metadata.   
 
-### Behavior: Android connect_camera during on_start()
-
-On Android, a `connect_camera()` called during `on_start()` will result in intermittent crashes during app start. The unfiltered logcat will contain: 'library "libdexfile.so" not found'.
-Use Kivy clock to schedule the `connect_camera()` one time step later.
-
-### Behavior: Android switching cameras, short duration inverted image.
-
-When switching cameras there may be a short duration inverted image, this is more likely on older Android devices.
-
 ### Behavior: Android armeabi-v7a build installed on an arm64-v8a device
 
-The implementation of Google's camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device. To rin on an arm64-v8a device you **must** build for arm64-v8a.
+The implementation of Google's camerax gradle dependencies appears to be architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device. To run on an arm64-v8a device you **must** build for arm64-v8a.
 
 ### Behavior: Android "No supported surface combination"
 
