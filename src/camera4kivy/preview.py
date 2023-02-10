@@ -10,6 +10,15 @@ if platform == 'android':
     from .preview_camerax import PreviewCameraX as CameraPreview
 else:
     from .preview_kivycamera import PreviewKivyCamera as CameraPreview
+    from .preview_kivycamera import KivyCameraProviderInfo
+    
+class CameraProviderInfo():
+    def get_name(self):
+        if platform == 'android':
+            provider = 'android'
+        else:
+            provider = KivyCameraProviderInfo().get_name()
+        return provider
 
 class Preview(AnchorLayout):
 
@@ -21,7 +30,7 @@ class Preview(AnchorLayout):
     orientation       = StringProperty()
     letterbox_color   = ColorProperty('black')
     filepath_callback = ObjectProperty()
-    camera_connected = False
+    inhibit_property = False
     preview = None
 
     ##########################################
@@ -36,7 +45,7 @@ class Preview(AnchorLayout):
         self.preview = CameraPreview()
         self.add_widget(self.label)
         self.add_widget(self.preview)
-        self.camera_connected = False
+        self.inhibit_property = False
         for key in ['letterbox_color', 'aspect_ratio',
                     'orientation']:
             if key in kwargs:
@@ -47,17 +56,17 @@ class Preview(AnchorLayout):
                     self.preview.set_orientation(kwargs[key])
         self._fbo = None
         self._busy = False
-        self._finished = False
+        self.camera_connected = False
         self._image_available = Event()
         self.analyze_resolution = 1024
         self.auto_analyze_resolution = []
     
     def on_orientation(self,instance,orientation):
-        if self.preview and not self.camera_connected:
+        if self.preview and not self.inhibit_property:
             self.preview.set_orientation(orientation)
 
     def on_aspect_ratio(self,instance, aspect_ratio):
-        if  self.preview and not self.camera_connected:
+        if  self.preview and not self.inhibit_property:
             self.preview.set_aspect_ratio(aspect_ratio)
 
     def on_size(self, layout, size):
@@ -73,8 +82,8 @@ class Preview(AnchorLayout):
     def connect_camera(self, analyze_pixels_resolution = 1024,
                        enable_analyze_pixels = False, **kwargs):
         self.analyze_resolution = analyze_pixels_resolution
+        self.inhibit_property = True
         self.camera_connected = True
-        self._finished = False
         self._fbo = None
         if enable_analyze_pixels:
             Thread(target=self.image_scheduler, daemon=True).start()
@@ -83,14 +92,14 @@ class Preview(AnchorLayout):
                                     analyze_proxy_callback =
                                         self.analyze_imageproxy_callback,
                                     canvas_callback =
-                                        self.canvas_instructions_callback,
+                                        self.possible_canvas_callback,
                                     **kwargs)
 
     def disconnect_camera(self):
         self._image_available.set()
-        self._finished = True
-        self.preview.disconnect_camera()
         self.camera_connected = False
+        self.preview.disconnect_camera()
+        self.inhibit_property = False
 
     def capture_screenshot(self, **kwargs):
         self.preview.capture_screenshot(**kwargs)
@@ -98,12 +107,12 @@ class Preview(AnchorLayout):
     def select_camera(self, camera_id):
         return self.preview.select_camera(camera_id)
 
+    ##########################################
+    # User Events - some platforms
+    ##########################################
+
     def capture_photo(self, **kwargs):
         self.preview.capture_photo(**kwargs)
-
-    ##########################################
-    # User Events - Android Only
-    ##########################################
 
     def capture_video(self, **kwargs):
         self.preview.capture_video(**kwargs)
@@ -111,8 +120,15 @@ class Preview(AnchorLayout):
     def stop_capture_video(self):
         self.preview.stop_capture_video()
 
-    def flash(self):
-        return self.preview.flash()
+    ##########################################
+    # User Events - Android Only
+    ##########################################
+
+    def flash(self, state = None):
+        return self.preview.flash(state)
+
+    def torch(self, state):
+        return self.preview.torch(state)
 
     def focus(self, x, y):
         self.preview.focus(x, y)
@@ -176,13 +192,17 @@ class Preview(AnchorLayout):
         while True:
             self._image_available.wait()
             self._image_available.clear()
-            if self._finished:
+            if not self.camera_connected:
                 break
             # Must pass pixels not Texture, becuase we are in a different
             # Thread
             self.analyze_pixels_callback(self.pixels, self.im_size, self.tpos,
                                          self.scale, self.mirror)
             self._busy = False
+
+    def possible_canvas_callback(self, texture, tex_size, tex_pos):
+        if self.camera_connected:
+            self.canvas_instructions_callback(texture, tex_size, tex_pos)
 
     ##########################################
     # Data Analysis Callbacks 

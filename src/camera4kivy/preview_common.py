@@ -115,7 +115,7 @@ class PreviewCommon(Widget):
     # File Utilities
     #############################################
 
-    def capture_path(self,location, subdir ,name):
+    def capture_path(self,location, subdir ,name, ext):
         if platform == 'ios':
             storage = location.lower()
             if storage not in ['private', 'shared']:
@@ -124,7 +124,7 @@ class PreviewCommon(Widget):
                 return ''
             location = self._camera.get_app_documents_directory()  
         return join(self._default_subdir(location, subdir),
-                    self._default_file_name(name))
+                    self._default_file_name(name, ext))
     
     def _default_subdir(self, location = '.', subdir=''):
         if not exists(location):

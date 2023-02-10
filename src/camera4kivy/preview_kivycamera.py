@@ -17,6 +17,15 @@ else:
 
 from kivy.logger import Logger
 
+class KivyCameraProviderInfo():
+    def get_name(self):
+        if Camera:
+            provider = str(Camera).split('.')[-2].split('_')[-1] 
+        else:
+            provider = ""
+        return provider
+
+
 class PreviewKivyCamera(PreviewCommon, CommonGestures):
 
     def __init__(self, **kwargs):
@@ -32,6 +41,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         self.window_width = Window.width
         if platform == 'ios':
             self._enable_on_resume()
+        self.provider = KivyCameraProviderInfo().get_name()
             
     def __del__(self):
         self.disconnect_camera()
@@ -92,10 +102,12 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         else:
             self.mirror = mirrored
         self.stop_camera()
-        Thread(target=self.start_camera, daemon=True).start()
+        #Thread(target=self.start_camera, daemon=True).start()
+        self.start_camera()
 
     def disconnect_camera(self):
         if self.starting_camera:
+            # This was related to the Thread above, now redundant?
             self.abort_camera_start = True
         else:
             self.stop_camera()
@@ -117,9 +129,11 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         self.switching_camera = False
         return index
 
+    # Screenshot
+    ######################
     def capture_screenshot(self, location = '.', subdir = '', name = ''):
         view_crop = self.screenshot_crop()
-        path = self.capture_path(location, subdir, name)
+        path = self.capture_path(location, subdir, name, '.jpg')
         tex = self.export_as_image().texture.get_region(*view_crop)
         tex.flip_vertical()
         if platform == 'ios':
@@ -129,28 +143,59 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         if self.callback:
             self.callback(path)
 
+    # Photo
+    ######################
     def capture_photo(self, location = '.', subdir = '', name = ''):
         if self._camera and self._camera.texture:
-            path = self.capture_path(location, subdir, name)
+            path = self.capture_path(location, subdir, name, '.jpg')
             tex = self._camera.texture.get_region(*self.tex_crop)
             if platform == 'ios':
                 self._camera.save_texture(tex, path)
+            elif self.provider in ['picamera2', 'opencv']:
+                self._camera.photo(path, self.callback)
+                return
             else:
                 tex.save(path, flipped = False)    
             if self.callback:
                 self.callback(path)
 
+    # Video
+    ######################
+
+    def capture_video(self, location = '', subdir = '', name = ''):
+        if self._camera and self._camera.texture:
+            if self.provider in ['picamera2', 'opencv']:
+                path = self.capture_path(location, subdir, name, '.mp4')
+                self._camera.video_start(path, self.callback)
+            
+    def stop_capture_video(self):
+        if self._camera and self._camera.texture:
+            if self.provider in ['picamera2', 'opencv']:
+                self._camera.video_stop()
+    
     ##############################
     # Preview Widget Touch Events
     ##############################
 
     # pinch/spread for zoom
     def cgb_zoom(self, touch0, touch1, x, y, scale):
-        if platform == 'ios':
-            if self._camera and self.enable_zoom_gesture:
+        if self._camera and self.enable_zoom_gesture:
+            if platform == 'ios':
                 level = max(self.cg_zoom_level[self.index] * scale, 1)
                 self.cg_zoom_level[self.index] = level 
-                self.zoom_abs(level)                
+                self.zoom_abs(level)
+            elif self.provider in ['picamera2']:
+                self._camera.zoom(scale)    ###### TODO zoom_level
+
+    # drag
+    def cgb_drag(self, touch, x, y, dx, dy):
+        if self._camera and self.enable_zoom_gesture:
+            if self.provider in ['picamera2']:
+                # normalize to preview image
+                crop = self.screenshot_crop()
+                dx = dx / crop[2]
+                dy = dy / crop[3]
+                self._camera.drag(dx, dy)
         
     #############################################
     # iOS only User Events
@@ -165,13 +210,10 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
     # Ignored User Events
     #############################################
 
-    def capture_video(self, location = '', subdir = '', name = ''):
-        pass
-    
-    def stop_capture_video(self):
-        pass
+    def flash(self, state):
+        return 'off'
 
-    def flash(self):
+    def torch(self, state):
         return 'off'
 
     def focus(self, x, y):
@@ -217,21 +259,28 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
                 if platform in ['macosx', 'ios']:
                     # default 16:9
                     self._sensor_resolution = [3840, 2160]
+                elif self.provider in ['picamera','opencv']:
+                    self._sensor_resolution = [1280 , 960]
+                elif self.provider in ['picamera2']:
+                    self._sensor_resolution = [800 , 600]
                 else:
                     #default 4:3 , value ignored by gi
                     self._sensor_resolution = [6400, 4800]
-                try:
-                    import picamera
-                    self._sensor_resolution = [1024 , 768]
-                except:
-                    pass
+
+            if self.provider in ['picamera2', 'opencv']:
+                context = self
+            else:
+                context = None
             self._camera = Camera(index= self.index,
                                   resolution = self._sensor_resolution,
-                                  callback = self.camera_error)
+                                  callback = self.camera_error,
+                                  context = context)
             self.error_message = ""
-        except AttributeError:
+        except AttributeError as e:
+            #Logger.warning(str(e))
             self.camera_error_message()
-        except:
+        except Exception as e:
+            #Logger.warning(str(e))
             if self._camera:
                 self.error_message = 'ERROR: Camera internal error.'
             else:
@@ -240,15 +289,22 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
 
         if self.error_message:
             self.canvas_text(self.error_message)
-                
+            
         if self._camera:
-            self._camera.start()
             self._camera.bind(on_load=self.configure_texture_crop)
             self._camera.bind(on_texture=self.on_tex)
+            self._camera.start()
         if self.abort_camera_start:
             self.stop_camera()
-        self.abort_camera = False
+            self._camera = None
+        self.abort_camera_start = False
         self.starting_camera = False
+
+    def on_load(self):
+        self.configure_texture_crop(None)
+
+    def on_texture(self):
+        self.on_tex(None)
 
     def camera_error(self):
         self.camera_error_message()
@@ -264,6 +320,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         if self._camera:
             self._camera.stop()
             self._camera.unbind(on_texture=self.on_tex)
+            self.clear_texture()
             if self._camera.__class__.__name__ == 'CameraGi':
                 self._camera.unload()
             del self._camera
@@ -273,9 +330,20 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
     # Texture 
     #############################################
 
+    def clear_texture(self):
+        if self._camera and self._camera.texture:
+            tex_size = self._camera.texture.size
+            buf = bytes([255] * tex_size[0] * tex_size[1] * 3)
+            fmt = self._camera._format   ## all the providers are 3 byte
+            self._camera.texture.blit_buffer(buf, colorfmt= fmt,
+                                             bufferfmt='ubyte')
+            self.on_tex(None)
+            
+
     def on_tex(self, camera):
         if self._camera:
             tex = self._camera.texture.get_region(*self.tex_crop)
+
             if self.data_callback:
                 self.data_callback(tex, self.view_pos,
                                    self.tscale, self.mirror)
@@ -296,12 +364,16 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
     def configure_texture_crop(self, dontcare):
         if not self._camera or not self._camera.texture:
             return
+        width_tex, height_tex = self._camera.texture.size
+        self.tex_crop = self.crop_for_aspect_orientation(width_tex, height_tex)
+        self.tscale = self.view_size[1] / self.tex_crop[3]
+
+    def crop_for_aspect_orientation(self, width_tex, height_tex):
         orientation = self.decode_orientation()
         if self.aspect_ratio == "4:3":
             aspect = 4 / 3
         else:
             aspect = 16 / 9        
-        width_tex, height_tex = self._camera.texture.size
         crop_pos_x = 0
         crop_pos_y = 0
         crop_siz_x = width_tex
@@ -313,37 +385,35 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
                     # texture is 16:9
                     if self.aspect_ratio == '4:3':
                         crop_siz_y = width_tex * aspect   #1
-                        crop_pos_y = (height_tex - crop_siz_y) / 2
+                        crop_pos_y = (height_tex - crop_siz_y) // 2
                 else:
                     # texture is 4:3
                     if self.aspect_ratio == '16:9':
-                        crop_siz_x = height_tex / aspect
-                        crop_pos_x = (width_tex - crop_siz_x) / 2
+                        crop_siz_x = height_tex // aspect
+                        crop_pos_x = (width_tex - crop_siz_x) // 2
             else:
                 # Landscape texture
-                crop_siz_x = height_tex / aspect
-                crop_pos_x = (width_tex - crop_siz_x) / 2
+                crop_siz_x = height_tex // aspect
+                crop_pos_x = (width_tex - crop_siz_x) // 2
         else: # Landscape
             if width_tex < height_tex:
                 # Portrait texture
-                crop_siz_y = width_tex / aspect
-                crop_pos_y = (width_tex - crop_siz_y) / 2
+                crop_siz_y = width_tex // aspect
+                crop_pos_y = (width_tex - crop_siz_y) // 2
             else:
                 # Landscape texture
                 if width_tex / height_tex > 1.5:
                     # texture is 16:9
                     if self.aspect_ratio == '4:3':
                         crop_siz_x = height_tex * aspect
-                        crop_pos_x = (width_tex - crop_siz_x) / 2
+                        crop_pos_x = (width_tex - crop_siz_x) // 2
                 else:
                     # texture is 4:3
                     if self.aspect_ratio == '16:9':
-                        crop_siz_y = width_tex / aspect
-                        crop_pos_y = (height_tex - crop_siz_y) / 2
-
-        self.tex_crop = [ crop_pos_x, crop_pos_y, crop_siz_x, crop_siz_y]
-        self.tscale = self.view_size[1] / crop_siz_y 
-
+                        crop_siz_y = width_tex // aspect
+                        crop_pos_y = (height_tex - crop_siz_y) // 2
+        return [ int(crop_pos_x), int(crop_pos_y),
+                 int(crop_siz_x), int(crop_siz_y)]
 
     @mainthread
     def canvas_text(self,text):

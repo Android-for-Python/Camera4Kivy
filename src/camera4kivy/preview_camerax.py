@@ -13,6 +13,7 @@ from kivy.clock import Clock, mainthread
 from kivy.graphics import Fbo, Callback, Rectangle, Rotate, Scale, Translate,\
     Color
 from kivy.graphics.texture import Texture
+from kivy.logger import Logger
 
 from datetime import datetime
 from os.path import exists, join
@@ -48,6 +49,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
         self._camera = None
         self.enable_zoom_gesture = False
         self.enable_focus_gesture  = False
+        self.block_pipeline = True
     
     ##############################
     # Lifecycle events
@@ -129,12 +131,24 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             default_zoom,
             data_format)
 
+        # check camerax_provider version
+        # Set in org/kivy/camerax/CameraX.java
+        latest = '0.0.3'  
+        try:
+            if self._camera.providerVersion() < latest:
+                Logger.warning('Update camerax_provider to the latest version, this is ' + latest)
+        except:
+            Logger.warning('Update camerax_provider to the latest version, this is ' + latest)
+
         # Configure the camera for the Kivy view port
         self._configure_camera(True)
 
-    # destroy camera
-    @run_on_ui_thread
     def disconnect_camera(self):
+        self.destroy_camera()
+        self.block_and_clear_pipeline() 
+        
+    @run_on_ui_thread
+    def destroy_camera(self):
         self.stop_capture_video()
         self._deschedule_pipeline()
         if self._camera:
@@ -271,6 +285,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
 
             # may have to wait for a capture to complete
             if not self.capture_in_progress:
+                self.block_and_clear_pipeline()
                 self.do_select_camera()
             else:
                 self.stop_capture_video()
@@ -281,6 +296,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
 
     def can_select_camera(self,dt):
         if not self.capture_in_progress:
+            self.block_and_clear_pipeline()
             self.do_select_camera()
             Clock.unschedule(self._facing_ev)
 
@@ -289,18 +305,33 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
         self._camera.select_camera(self.facing)
             
     # Sequence flash : off, on, auto, ...
-    def flash(self):
+    def flash(self, state = None):
+        # None, auto sequence, 0 ->2 set state
         if self._camera:
-            if self.flash_state == 'off':
-                self.flash_state = 'on'
-            elif self.flash_state == 'on':
-                self.flash_state = 'auto'
-            else:
-                self.flash_state = 'off'
+            if state == None:
+                if self.flash_state == 'off':
+                    self.flash_state = 'on'
+                elif self.flash_state == 'on':
+                    self.flash_state = 'auto'
+                else:
+                    self.flash_state = 'off'
+            elif state in ['off', 'on', 'auto']:
+                self.flash_state = state
             self.flash_state = self._camera.flash(self.flash_state)
             return self.flash_state
         return "off"
 
+    def torch(self, state = None):
+        if self._camera:
+            if state in ['off', 'on']:
+                try:
+                    return self._camera.torch(state)
+                except:
+                    Logger.warning('Update camerax_provider to >= 0.0.3')
+                    return 'off'
+        else:
+            return 'off'
+                
     # if enable_focus_gesture == True, then this is called by a tap gesture
     def focus(self, x, y):
         if self._camera:
@@ -381,12 +412,24 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
     ##############################
     # Fill Preview Pipeline
     ##############################
-    
+            
+    def block_and_clear_pipeline(self):
+        self.block_pipeline = True
+        if self._camera and self._fbo.texture:
+            tex_size = self._fbo.texture.size
+            buf = bytes([255] * tex_size[0] * tex_size[1] * 4)
+            self._fbo.texture.blit_buffer(buf, colorfmt='rgba',
+                                          bufferfmt='ubyte')
+            self._analyze_texture()
+            self._update_canvas() 
+
     def _schedule_pipeline(self):
         self._deschedule_pipeline()
         if self._camera and self._camera_texture and self._fbo.texture:
             self._set_surface_provider(True)
-            Thread(target=self._pipeline_thread,daemon=True).start()            
+            self.block_pipeline = False
+            self._update_ev = Clock.schedule_interval(self._update_pipeline,
+                                                      1 / 30)
 
     def _deschedule_pipeline(self):
         if self._update_ev is not None:
@@ -394,13 +437,8 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             self._update_ev.cancel()
             self._update_ev = None
 
-    def _pipeline_thread(self):
-        fps = 30
-        self._update_ev = Clock.schedule_interval(self._update_pipeline,
-                                                  1 / fps)
-        
     def _update_pipeline(self, dt):
-        if self._camera.imageReady():
+        if self._camera.imageReady() and not self.block_pipeline:
             self._camera_texture_cb.ask_update() 
             self._fbo.draw()  
             self._analyze_texture()
