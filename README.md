@@ -15,11 +15,11 @@ Camera4Kivy
     + [Run Time Permissions](#run-time-permissions-1)
 - [Examples](#examples)
   * [Tested Examples](#tested-examples)
-    + [C4K-Photo-Example](#-c4k-photo-example--https---githubcom-android-for-python-c4k-photo-example-)
-    + [C4K-QR-Example](#-c4k-qr-example--https---githubcom-android-for-python-c4k-qr-example-)
-    + [C4K-OpenCV-Example](#-c4k-opencv-example--https---githubcom-android-for-python-c4k-opencv-example-)
-    + [C4K-MLKit-Example](#-c4k-mlkit-example--https---githubcom-android-for-python-c4k-mlkit-example-)
-    + [C4K-TFLite-Example](#-c4k-tflite-example--https---githubcom-android-for-python-c4k-tflite-example-)
+    + [C4K Photo Example](#c4k-photo-example)
+    + [C4K QR Example](#c4k-qr-example)
+    + [C4K OpenCV Example](#c4k-opencv-example)
+    + [C4K MLKit Example](#c4k-mlkit-example)
+    + [C4K TFLite Example](#c4k-tflite-example)
   * [Tested Platforms](#tested-platforms)
 - [Preview Widget](#preview-widget)
   * [Preview Widget Properties](#preview-widget-properties)
@@ -201,20 +201,23 @@ The Photo example illustrates basic camera usage, try this first. The remaining 
 
 On Android and iOS the app can rotate when the device rotates, on the desktop you can change the window size to simulate orientation, and thus rotating a mobile device. 
 
-#### [C4K-Photo-Example](https://github.com/Android-for-Python/c4k_photo_example)
-Illustrates basic layout using screens. Basic camera functionality including photo capture, screenshot capture, and on Android capture of video with audio.
+#### C4K Photo Example 
+[C4K-Photo-Example](https://github.com/Android-for-Python/c4k_photo_example). Illustrates basic layout using screens. Basic camera functionality including photo capture, screenshot capture, and on Android capture of video with audio.
 On Raspberry PI a mouse must be used, a touch pad does not work correctly.
 
-#### [C4K-QR-Example](https://github.com/Android-for-Python/c4k_qr_example)
-Everything you need to read a restaurant menu. Long press or double click on a highlighted QR code to open a web browser. Illustrates basic analysis, screen annotation, and user interaction. 
+#### C4K QR Example
+[C4K-QR-Example](https://github.com/Android-for-Python/c4k_qr_example). Everything you need to read a restaurant menu. Long press or double click on a highlighted QR code to open a web browser. Illustrates basic analysis, screen annotation, and user interaction. 
 
-#### [C4K-OpenCV-Example.](https://github.com/Android-for-Python/c4k_opencv_example)
+#### C4K OpenCV Example
+[C4K OpenCV Example](https://github.com/Android-for-Python/c4k_opencv_example)
 Edge detect the video stream. Illustrates using OpenCV analysis and replacing the original preview with the transformed image.
 
-#### [C4K-MLKit-Example](https://github.com/Android-for-Python/c4k_mlkit_example)
+#### C4K MLKit Example
+[C4K MLKit Example](https://github.com/Android-for-Python/c4k_mlkit_example)
 Face detect, MLKit is Android only. Illustrates using the ImageProxy api.
 
-#### [C4K-TFLite-Example](https://github.com/Android-for-Python/c4k_tflite_example)
+#### C4K TFLite Example
+[C4K TFLite Example](https://github.com/Android-for-Python/c4k_tflite_example)
 Object classification. Illustrates using a large Tensorflow Lite model, and writing text to the Preview image.
 
 ### Tested Platforms 
