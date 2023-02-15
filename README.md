@@ -3,7 +3,7 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
-2023/02/09 : Android users: camerax_provider has been updated to version 0.0.3 
+2023/02/09 : Android users: camerax_provider has been updated to version 0.0.3
 
 - [Overview](#overview)
 - [Install](#install)
@@ -32,6 +32,7 @@ Camera4Kivy
       - [mirrored](#mirrored)
       - [filepath_callback](#filepath-callback)
       - [sensor_resolution](#sensor-resolution)
+      - [default_zoom](#default-zoom)
       - [analyze_pixels_resolution](#analyze-pixels-resolution)
       - [enable_analyze_pixels](#enable-analyze-pixels)
       - [enable_analyze_imageproxy](#enable-analyze-imageproxy)
@@ -289,6 +290,9 @@ The filepath_callback can also be used to reset any 'video recording' indicator 
 
 ##### sensor_resolution
 Overrides the default sensor resolution, which is the highest resolution available, except Raspberry Pi where it is (1024, 768). Tuple of two integers, for example `sensor_resolution = (640, 480)`. The resulting capture resolution obtained depends on the behavior of the camera provider (for example it is ignored by GStreamer). The capture resolution also depends on the relative orientation and aspect ratio of the Preview. Treat the value specified as a request that may not be exactly honored.
+
+##### default_zoom
+Set the default zoom when the camera is connected, `0.5` is the default value. 
 
 ##### analyze_pixels_resolution
 Sets the pixels resolution passed by `analyze_pixels_callback()`. A scalar, representing the number of pixels on the long edge, the short edge is determined using the aspect ratio. For example `analyze_pixels_resolution = 720`. The default is the minimum of cropped sensor resolution and 1024.
