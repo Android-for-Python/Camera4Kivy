@@ -30,15 +30,15 @@ Camera4Kivy
     + [Connect Camera](#connect-camera)
       - [camera_id](#camera-id)
       - [mirrored](#mirrored)
-      - [filepath_callback](#filepath-callback)
-      - [sensor_resolution](#sensor-resolution)
-      - [default_zoom](#default-zoom)
-      - [analyze_pixels_resolution](#analyze-pixels-resolution)
-      - [enable_analyze_pixels](#enable-analyze-pixels)
-      - [enable_analyze_imageproxy](#enable-analyze-imageproxy)
-      - [enable_zoom_gesture](#enable-zoom-gesture)
-      - [enable_focus_gesture](#enable-focus-gesture)
-      - [imageproxy_data_format:](#imageproxy-data-format-)
+      - [filepath_callback](#filepath_callback)
+      - [sensor_resolution](#sensor_resolution)
+      - [default_zoom](#default_zoom)
+      - [analyze_pixels_resolution](#analyze_pixels_resolution)
+      - [enable_analyze_pixels](#enable_analyze_pixels)
+      - [enable_analyze_imageproxy](#enable_analyze_imageproxy)
+      - [enable_zoom_gesture](#enable_zoom_gesture)
+      - [enable_focus_gesture](#enable_focus_gesture)
+      - [imageproxy_data_format](#imageproxy_data_format)
     + [Disconnect Camera](#disconnect-camera)
     + [Capture](#capture)
       - [location](#location)
@@ -49,7 +49,7 @@ Camera4Kivy
     + [Flash](#flash)
     + [Torch](#torch)
     + [Focus](#focus)
-    + [camera_connected](#camera-connected)
+    + [camera_connected](#camera_connected)
 - [Image analysis](#image-analysis)
   * [Overview and Examples](#overview-and-examples)
   * [User Interaction](#user-interaction)
@@ -312,7 +312,7 @@ Default True.  Android and iOS only.
 ##### enable_focus_gesture
 Default True. Android only.
        
-##### imageproxy_data_format:
+##### imageproxy_data_format
 Applies only to the Android ImageProxy api. 'yuv420' (default) or 'rgba'.
 
 
