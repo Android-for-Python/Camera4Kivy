@@ -65,7 +65,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         self.canvas.clear()
         if self.error_message:
             self.canvas_text(self.error_message)
-        elif self._camera:
+        elif self._camera and self._camera._texture:
             self.on_tex(None)
         else:
             with self.canvas:
