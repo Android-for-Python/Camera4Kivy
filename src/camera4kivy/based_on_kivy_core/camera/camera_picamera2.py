@@ -162,6 +162,7 @@ class CameraPi2():
         self.zoom_level = None
         self._rotate = 0
         self.video_recording = False
+        self.audio = False
 
     # Start
     # Choose sensor, configure pc2
@@ -377,7 +378,7 @@ class CameraPi2():
             self.picam2.switch_mode(self.video_config)
             encoder = H264Encoder()
             output = FfmpegOutputPlus(filepath, rotate = self._rotate,
-                                      audio=True, audio_sync = 0)
+                                      audio= self.audio, audio_sync = 0)
             self.picam2.start_encoder(encoder, output)
 
     def video_stop(self):
@@ -476,6 +477,7 @@ class CameraPiCamera2(CameraBase):
         self.started = False
         self.fbo = None
         self._rotate = kwargs.get('rotation', 0) 
+        self.audio = kwargs.get('audio', False) 
         super().__init__(**kwargs)
 
     # Lifecycle
@@ -512,6 +514,7 @@ class CameraPiCamera2(CameraBase):
             self._camera._framerate = self._framerate
             self._camera._context = self._context
             self._camera._rotate = self._rotate
+            self._camera.audio = self.audio
             self._texture = None
             if self._update_ev is not None:
                 self._update_ev.cancel()

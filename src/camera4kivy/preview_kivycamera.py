@@ -37,6 +37,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         self.abort_camera_start = False
         self.enable_zoom_gesture = False
         self.enable_focus_gesture  = False
+        self.audio  = False
         self.cg_zoom_level = [1 , 1]
         self.window_width = Window.width
         if platform == 'ios':
@@ -80,6 +81,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
     def connect_camera(self,
                        camera_id = '0',
                        mirrored = True,
+                       audio = False,
                        sensor_resolution = [],
                        sensor_rotation = 0,
                        default_zoom = 1.0,
@@ -90,6 +92,8 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
                        canvas_callback = None,
                        **kwargs):
         self.set_index(camera_id)
+        if audio == True:
+            self.audio = True
         self.set_resolution(sensor_resolution)
         self.set_rotation(sensor_rotation)
         self.set_filepath_callback(filepath_callback)
@@ -344,7 +348,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
             
 
     def on_tex(self, camera):
-        if self._camera:
+        if self._camera and self._camera.texture:
             tex = self._camera.texture.get_region(*self.tex_crop)
 
             if self.data_callback:
