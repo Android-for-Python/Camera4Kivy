@@ -36,6 +36,11 @@ class PreviewCommon(Widget):
         if orientation in ['landscape', 'portrait','same','opposite']:
             self.orientation = orientation
 
+    def set_rotation(self, rotation):
+        self._sensor_rotation = 0
+        if rotation in [0,90,180,270]:
+            self._sensor_rotation = rotation
+
     def set_resolution(self, resolution):
         if resolution and\
            (type(resolution) is tuple or type(resolution) is list) and\

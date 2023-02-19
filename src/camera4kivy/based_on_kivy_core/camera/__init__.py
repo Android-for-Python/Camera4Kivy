@@ -82,7 +82,33 @@ class CameraBase(EventDispatcher):
     #def on_load(self):
     #    pass
 
-# Load the appropriate providers
+import kivy
+import importlib
+
+def select_provider(category, llist, base='kivy.core'):
+    category = category.lower()
+    basemodule = category
+    for option, modulename, classname in llist:
+        if option not in kivy.kivy_options[category]:
+            continue
+        try:
+            name = '{0}.{1}.{2}'.format(base, basemodule, modulename)
+            mod = importlib.__import__(name=name,
+                                       globals=globals(),
+                                       locals=locals(),
+                                       fromlist=[modulename], level=0)
+            cls = mod.__getattribute__(classname)
+
+            Logger.info('{0}: Provider: {1}'.format(category.capitalize(),
+                                                    option))
+            return cls
+
+        except Exception as e:
+            pass
+        
+    if platform not in ['android']:
+        Logger.warning('{0}: No Provider found.'.format(category.capitalize()))
+    
 providers = ()
 
 if platform in ['macosx', 'ios']:
@@ -96,12 +122,18 @@ elif platform == 'win':
 elif platform == 'android':
     pass
 else:
-    #providers += (('picamera2', 'camera_picamera2', 'CameraPiCamera2'), )
+    providers += (('picamera', 'camera_picamera2', 'CameraPiCamera2'), )
     providers += (('picamera', 'camera_picamera', 'CameraPiCamera'), )
     providers += (('gi', 'camera_gi', 'CameraGi'), )
     providers += (('opencv', 'camera_opencv', 'CameraOpenCV'), )
 
 if providers:
-    ## CHANGED TO camera4kivy.based_on_kivy_core
-    Camera = core_select_lib('camera', (providers),
+    Camera = select_provider('camera', (providers),
                              base='camera4kivy.based_on_kivy_core')
+
+
+
+
+
+
+    

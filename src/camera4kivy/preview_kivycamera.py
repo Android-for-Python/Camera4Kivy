@@ -81,6 +81,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
                        camera_id = '0',
                        mirrored = True,
                        sensor_resolution = [],
+                       sensor_rotation = 0,
                        default_zoom = 1.0,
                        enable_zoom_gesture = True,
                        enable_focus_gesture = True,                         
@@ -90,6 +91,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
                        **kwargs):
         self.set_index(camera_id)
         self.set_resolution(sensor_resolution)
+        self.set_rotation(sensor_rotation)
         self.set_filepath_callback(filepath_callback)
         self.data_callback = analyze_callback
         self.canvas_callback = canvas_callback
@@ -273,6 +275,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
                 context = None
             self._camera = Camera(index= self.index,
                                   resolution = self._sensor_resolution,
+                                  rotation = self._sensor_rotation,
                                   callback = self.camera_error,
                                   context = context)
             self.error_message = ""
