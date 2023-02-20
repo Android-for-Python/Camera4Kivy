@@ -32,6 +32,7 @@ Camera4Kivy
       - [mirrored](#mirrored)
       - [filepath_callback](#filepath_callback)
       - [sensor_resolution](#sensor_resolution)
+      - [sensor_rotation](#sensor_rotation)
       - [default_zoom](#default_zoom)
       - [analyze_pixels_resolution](#analyze_pixels_resolution)
       - [enable_analyze_pixels](#enable_analyze_pixels)
@@ -46,6 +47,7 @@ Camera4Kivy
       - [name](#name)
     + [Select Camera](#select-camera)
     + [Zoom](#zoom)
+    + [Pan/scroll](#panscroll)
     + [Flash](#flash)
     + [Torch](#torch)
     + [Focus](#focus)
@@ -231,11 +233,12 @@ Object classification. Illustrates using a large Tensorflow Lite model, and writ
 | MLKit | | | | :heavy_check_mark: | | |
 | TFLite   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | :heavy_check_mark: |
 
-- Windows : Windows 11, i7-10 @ 1.1GHz, Python 3.8.2  Kivy==2.1.0.dev0
+- Windows : Windows 11, i7-10 @ 1.1GHz, Python 3.11.1  Kivy==2.2.0.dev0
 - Windows : Windows 10, i3-7 @ 2.4GHz, Python 3.9.7 Kivy==2.0.0
 - Macos   : Big Sur,  i5-10 @ @ 1.1GHz, Python 3.9.9 Kivy==2.0.0
 - Linux   : Raspberry Buster, Cortex-A72 @ 1.5GHz Python3.7.3 Kivy==2.0.0
-- Android : build : arm64-v8a  device: Android 12, Pixel 5
+- Linux   : Raspberry Bullseye, Cortex-A72 @ 1.5GHz Python3.9.2 Kivy==2.1.0
+- Android : build : arm64-v8a  device: Android 12, Pixel 5 3.10.6 Kivy==2.2.0.dev0
 - Android : build : armeabi-v7a device: Android 6, Nexus 5  Start is somewhat slow.
 - iOS     : iPhone SE (second generation)
 - Coral   : [Accelerator](https://coral.ai/products/accelerator) tested with Windows 11 , gave very approximately an order of magnitude speed up.
@@ -291,8 +294,11 @@ The filepath_callback can also be used to reset any 'video recording' indicator 
 ##### sensor_resolution
 Overrides the default sensor resolution, which is the highest resolution available, except Raspberry Pi where it is (1024, 768). Tuple of two integers, for example `sensor_resolution = (640, 480)`. The resulting capture resolution obtained depends on the behavior of the camera provider (for example it is ignored by GStreamer). The capture resolution also depends on the relative orientation and aspect ratio of the Preview. Treat the value specified as a request that may not be exactly honored.
 
+##### sensor_rotation
+On Picamera2 sensor_rotation can be sepecifed in `[0, 90, 180, 270]`, where `0` is the default landscape orientation. 
+
 ##### default_zoom
-Set the default zoom when the camera is connected, `0.5` is the default value. 
+Set the default zoom when the camera is connected. On Android `0.5` is the default value. 
 
 ##### analyze_pixels_resolution
 Sets the pixels resolution passed by `analyze_pixels_callback()`. A scalar, representing the number of pixels on the long edge, the short edge is determined using the aspect ratio. For example `analyze_pixels_resolution = 720`. The default is the minimum of cropped sensor resolution and 1024.
@@ -336,7 +342,7 @@ However on Android a disconnect immediately after a capture has be initiated may
     def stop_capture_video(self):         # Android only
 ```
 
-Video capture is only available on Android or with the OpenCV camera provider. Capturing audio with video is only available on Android.
+Video capture is only available on Android, Picamera2, or OpenCV camera providers. Capturing audio with video is available on Android and Picamera2. OpenCV video quality is poor.
 
 Captures are never mirrored, except a screenshot capture if the Preview is mirrored. Capture resolution is discussed [here](https://github.com/Android-for-Python/Camera4Kivy#capture-resolution).
 
@@ -384,11 +390,17 @@ Change the currently connected camera, camera_id must specify a physically conne
 ```
 
 #### Zoom
-On Android only, zoom_delta() is called by pinch/spread gesture unless disabled.
+On Android and Picamera2, zoom_delta() is called by pinch/spread gesture unless disabled.
 On iOS only, zoom_abs() is called by pinch/spread gesture unless disabled.
 ```python 
     def zoom_delta(self, delta_scale):  
     def zoom_abs(self, scale):  
+```
+
+#### Pan/scroll
+On Picamera2 pan/scroll a zoom'd image with a drag gesture.
+```python 
+    def drag(self, delta_x, delta_y):
 ```
 
 #### Flash
@@ -657,9 +669,9 @@ Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most 
 | Linux       | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
 |             | [OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
 | Rasberry    | [Picamera](https://github.com/Android-for-Python/camera4kivy#picamera)    | <= Buster      |
-|             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)  |  <= Buster |
-|             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv) |  <= Buster  |
 |             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#picamera2)    | >= Bullseye      |
+|             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)  |  |
+|             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv) |  |
 | Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camera-provider)                      |  Android >= 5.0 |
 | iOS         | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)                      |
 
@@ -698,6 +710,8 @@ Set `p4a.hook` to enable the app's use of the camera provider.
 
 `pip3 install opencv-python`
 
+Video recording (no audio) is available, but uncompressed, and may be low quality.
+
 ### GStreamer
 
 Depends on the Linux flavor, but commonly:
@@ -707,10 +721,10 @@ Depends on the Linux flavor, but commonly:
 `sudo apt-get install gstreamer1.0-dev`
 
 ### Picamera
-Pre-installed
+Pre-installed on Buster. 
 
 ### Picamera2
-Raspberry PI Bullseye support currently not available.
+May be pre-instaled on Bullseye. Additional features for native Pi cameras: higher resolution photos, video optionally with audio, zoom, pan when zoom'd, sensor rotation. USB cameras are not currently supported. 
 
 ### AVFoundation
 Pre-installed

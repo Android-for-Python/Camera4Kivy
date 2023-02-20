@@ -191,7 +191,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
                 self.cg_zoom_level[self.index] = level 
                 self.zoom_abs(level)
             elif self.provider in ['picamera2']:
-                self._camera.zoom(scale)    ###### TODO zoom_level
+                self._camera.zoom(scale)   
 
     # drag
     def cgb_drag(self, touch, x, y, dx, dy):
@@ -211,6 +211,20 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
         if platform == 'ios' and self._camera:
             self._camera.zoom_level(level)
 
+    #############################################
+    # Picamera2 only User Events
+    #############################################
+
+    def zoom_delta(self, delta_scale):
+        if self._camera and self.provider in ['picamera2']:
+            self._camera.zoom(delta_scale)
+
+    def drag(self, delta_x, delta_y):
+        if self._camera and self.provider in ['picamera2']:
+            crop = self.screenshot_crop()
+            dx = delta_x / crop[2]
+            dy = delta_y / crop[3]
+            self._camera.drag(dx, dy)
 
     #############################################
     # Ignored User Events
@@ -301,6 +315,7 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
             self._camera.bind(on_load=self.configure_texture_crop)
             self._camera.bind(on_texture=self.on_tex)
             self._camera.start()
+            self.zoom_delta(self.default_zoom)
         if self.abort_camera_start:
             self.stop_camera()
             self._camera = None
