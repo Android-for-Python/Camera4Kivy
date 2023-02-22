@@ -73,7 +73,6 @@ Camera4Kivy
   * [OpenCV](https://github.com/Android-for-Python/Camera4Kivy#opencv)
   * [GStreamer](https://github.com/Android-for-Python/Camera4Kivy#gstreamer)
   * [Picamera](https://github.com/Android-for-Python/Camera4Kivy#picamera)
-  * [Picamera2](https://github.com/Android-for-Python/Camera4Kivy#picamera2)
   * [AVFoundation](https://github.com/Android-for-Python/Camera4Kivy#avfoundation)
 - [Known Behavior](https://github.com/Android-for-Python/Camera4Kivy#known-behavior)
   * [Behavior: Android .mp4 Orientation](https://github.com/Android-for-Python/Camera4Kivy#behavior--android-mp4-orientation)

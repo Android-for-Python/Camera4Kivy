@@ -73,7 +73,6 @@ Camera4Kivy
   * [OpenCV](#opencv)
   * [GStreamer](#gstreamer)
   * [Picamera](#picamera)
-  * [Picamera2](#picamera2)
   * [AVFoundation](#avfoundation)
 - [Known Behavior](#known-behavior)
   * [Behavior: Android .mp4 Orientation](#behavior--android-mp4-orientation)
@@ -659,7 +658,7 @@ Nothing to do with a camera, it is a physical property of a screen. A scalar mea
 
 ## Camera Provider
 
-Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most platforms this uses the same provider as Kivy, with modified defaults.
+Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most platforms this uses the same provider as Kivy, with modified defaults. On Android, iOS, and MacOS there is only a single provider.
 
 | Platform    | Provider      | Requires       |
 |-------------|---------------|----------------|
@@ -668,8 +667,7 @@ Camera4Kivy depends on a 'camera provider' to access the OS camera api. On most 
 | Macos       | [AVFoundation](https://github.com/Android-for-Python/camera4kivy#avfoundation)| OSX >= 10.7    |   
 | Linux       | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)                      |
 |             | [OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv)                      |
-| Rasberry    | [Picamera](https://github.com/Android-for-Python/camera4kivy#picamera)    | <= Buster      |
-|             | [Picamera2](https://github.com/Android-for-Python/camera4kivy#picamera2)    | >= Bullseye      |
+| Rasberry    | [Picamera](https://github.com/Android-for-Python/camera4kivy#picamera)(2)    |       |
 |             | [Gstreamer](https://github.com/Android-for-Python/camera4kivy#gstreamer)  |  |
 |             |[OpenCV](https://github.com/Android-for-Python/camera4kivy#opencv) |  |
 | Android     | [CameraX](https://github.com/Android-for-Python/camera4kivy#android-camera-provider)                      |  Android >= 5.0 |
@@ -721,10 +719,9 @@ Depends on the Linux flavor, but commonly:
 `sudo apt-get install gstreamer1.0-dev`
 
 ### Picamera
-Pre-installed on Buster. 
+This uses either the Picamera or Picamera2 package, depending on which is installed (they are mutually exclusive).
 
-### Picamera2
-May be pre-instaled on Bullseye. Additional features for native Pi cameras: higher resolution photos, video optionally with audio, zoom, pan when zoom'd, sensor rotation. USB cameras are not currently supported. 
+If Picamera2 is installed there are additional features for native Pi cameras: higher resolution photos, video (optionally with audio), zoom, pan when zoom'd, sensor rotation. However USB cameras are not currently supported. 
 
 ### AVFoundation
 Pre-installed

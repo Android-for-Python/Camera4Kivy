@@ -239,9 +239,6 @@ class PreviewKivyCamera(PreviewCommon, CommonGestures):
     def focus(self, x, y):
         pass
 
-    def zoom_delta(self, delta_scale):
-        pass
-
     #############################################
     # Parse Arguments
     #############################################

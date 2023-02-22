@@ -422,43 +422,48 @@ class CameraPi2():
             isize = tsize
             translate = 0
         origin = (tsize[0]//2, tsize[1]//2)
-        if self.previous_fmt != fmt:
-            self.fbo = None
-        if self.previous_size[0] != size[0] or\
-           self.previous_size[1] != size[1]:
-            self.fbo = None
-        if self.previous_tsize[0] != tsize[0] or\
-           self.previous_tsize[1] != tsize[1]:
-            self.fbo = None            
-        if not self.fbo:
-            if fmt == 'YUV420':
-                uv_size = (size[0]//2, size[1]//2 )
-            else:
-                uv_size = (size[0]//2, size[1]) 
+        if fmt == 'YUV420':
+            uv_size = (size[0]//2, size[1]//2 )
+        else:
+            uv_size = (size[0]//2, size[1]) 
+            
+        if self.previous_size[0] != size[0] or self.previous_size[1] != size[1]:
             self.tex_y = Texture.create(size= size, colorfmt='luminance')
             self.tex_u = Texture.create(size= uv_size, colorfmt='luminance')
             self.tex_v = Texture.create(size= uv_size, colorfmt='luminance')
+
+        if self.previous_tsize[0] != tsize[0] or\
+           self.previous_tsize[1] != tsize[1] or\
+               self.fbo == None:
+            self.previous_tsize = tsize
             self.fbo = Fbo(size=tsize)   # size for bilt to self._texture
             self.fbo.texture.flip_vertical()
             with self.fbo:
-                BindTexture(texture=self.tex_u, index=1)
-                BindTexture(texture=self.tex_v, index=2)
+                self.b_u = BindTexture(texture=self.tex_u, index=1)
+                self.b_v = BindTexture(texture=self.tex_v, index=2)
                 Rotate(origin = origin, angle = 360-self._rotate,
                        axis = (0, 0, 1))
                 Translate(0, translate)
-                Rectangle(size=isize, texture=self.tex_y)
+                self.r_y = Rectangle(size=isize, texture=self.tex_y)
             self.fbo.shader.fs = self.YUV_RGB_FS
             self.fbo['tex_y'] = 0
             self.fbo['tex_u'] = 1
             self.fbo['tex_v'] = 2
+            
+        if self.previous_size[0] != size[0] or self.previous_size[1] != size[1]:
+            self.previous_size = size
+            self.r_y.size = isize
+            self.r_y.texture = self.tex_y
+            self.b_u.texture = self.tex_u
+            self.b_v.texture = self.tex_v
+            # Repeat previous pixels to prevent flicker on change
+            return bytes(self.fbo.texture.pixels)
+        
         self.tex_y.blit_buffer(y, colorfmt='luminance')
         self.tex_u.blit_buffer(u, colorfmt='luminance')
         self.tex_v.blit_buffer(v, colorfmt='luminance')
         self.fbo.ask_update()
         self.fbo.draw()
-        self.previous_fmt = fmt
-        self.previous_size = size
-        self.previous_tsize = tsize
         return self.fbo.texture.pixels
 
 
