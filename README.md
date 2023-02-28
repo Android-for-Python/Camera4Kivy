@@ -410,7 +410,7 @@ Android only, and for capture photo only, the value is ignored for video and dat
 ```
 
 #### Torch
-Android only, immediately turns the flash on in any use case. The `state` argument must be in `['on', 'off']`
+Android only, immediately turns the torch on in any use case. The `state` argument must be in `['on', 'off']`
 
 ```python 
     def flash(self, state)
