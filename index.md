@@ -78,4 +78,4 @@ Camera4Kivy
   * [Behavior: Android .mp4 Orientation](https://github.com/Android-for-Python/Camera4Kivy#behavior-android-mp4-orientation)
   * [Behavior: Android .jpg Orientation.](https://github.com/Android-for-Python/Camera4Kivy#behavior-android-jpg-orientation)
   * [Behavior: Android armeabi-v7a build installed on an arm64-v8a device](https://github.com/Android-for-Python/Camera4Kivy#behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device)
-  * [Behavior: Android "No supported surface combination"](https://github.com/Android-for-Python/Camera4Kivy#behavior-android--no-supported-surface-combination-)
+  * [Behavior: Android "No supported surface combination"](https://github.com/Android-for-Python/Camera4Kivy#behavior-android-no-supported-surface-combination)
