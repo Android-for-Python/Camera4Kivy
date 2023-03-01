@@ -75,10 +75,10 @@ Camera4Kivy
   * [Picamera](#picamera)
   * [AVFoundation](#avfoundation)
 - [Known Behavior](#known-behavior)
-  * [Behavior: Android .mp4 Orientation](#behavior--android-mp4-orientation)
-  * [Behavior: Android .jpg Orientation.](#behavior--android-jpg-orientation)
-  * [Behavior: Android armeabi-v7a build installed on an arm64-v8a device](#behavior--android-armeabi-v7a-build-installed-on-an-arm64-v8a-device)
-  * [Behavior: Android "No supported surface combination"](#behavior--android--no-supported-surface-combination-)
+  * [Behavior: Android .mp4 Orientation](#behavior-android-mp4-orientation)
+  * [Behavior: Android .jpg Orientation.](#behavior-android-jpg-orientation)
+  * [Behavior: Android armeabi-v7a build installed on an arm64-v8a device](#behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device)
+  * [Behavior: Android "No supported surface combination"](#behavior-android--no-supported-surface-combination-)
 
 ## Overview
 
@@ -244,7 +244,11 @@ Object classification. Illustrates using a large Tensorflow Lite model, and writ
 
 ## Preview Widget
 
-An app can have multiple `Preview` widgets, but only one can be connected to the physical camera unit at a time. A natural way to implement this is to add a preview widget to a screen's contents, then connect to the camera unit `on_enter` and disconnect `on_pre_leave`. Or if using a ModalView, Popup, or MDDialog use `on_open` and `on_pre_dismiss`. The C4K-Photo-Example illustrates this, the other examples simply connect the camera after `on_start()` and disconnect `on_stop()`.
+An app can have multiple `Preview` widgets instantiated, but only one can be connected to the physical camera unit at a time. A natural way to implement this is to add a Preview widget to a screen's contents, then connect to the camera unit `on_enter` and disconnect `on_pre_leave`. Or if using a ModalView, Popup, or MDDialog use `on_open` and `on_pre_dismiss`. The C4K-Photo-Example illustrates the screen case.
+
+The other examples simply connect the camera **after** `on_start()` and disconnect `on_stop()`. The **after** `on_start` is required on Android; both for reliable camera function, and so that the camera is only connected after CAMERA permission has been granted.
+
+There is one special case. For the **first** screen, Kivy calls `on_enter` before `on_start`. This violates the requirements described in the previous paragraph. For the **first screen only**, connect the camera after `on_start` and after CAMERA permission has been granted, and not from `on_enter`.  
 
 ### Preview Widget Properties
 
