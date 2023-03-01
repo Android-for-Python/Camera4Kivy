@@ -78,7 +78,7 @@ Camera4Kivy
   * [Behavior: Android .mp4 Orientation](#behavior-android-mp4-orientation)
   * [Behavior: Android .jpg Orientation.](#behavior-android-jpg-orientation)
   * [Behavior: Android armeabi-v7a build installed on an arm64-v8a device](#behavior-android-armeabi-v7a-build-installed-on-an-arm64-v8a-device)
-  * [Behavior: Android "No supported surface combination"](#behavior-android--no-supported-surface-combination-)
+  * [Behavior: Android "No supported surface combination"](#behavior-android-no-supported-surface-combination)
 
 ## Overview
 
@@ -248,7 +248,7 @@ An app can have multiple `Preview` widgets instantiated, but only one can be con
 
 The other examples simply connect the camera **after** `on_start()` and disconnect `on_stop()`. The **after** `on_start` is required on Android; both for reliable camera function, and so that the camera is only connected after CAMERA permission has been granted.
 
-There is one special case. For the **first** screen, Kivy calls `on_enter` before `on_start`. This violates the requirements described in the previous paragraph. For the **first screen only**, connect the camera after `on_start` and after CAMERA permission has been granted, and not from `on_enter`.  
+There is one special case. For the **first** screen, Kivy calls `on_enter` before `on_start`. This violates the requirements described in the previous paragraph. For a Preview used in the **first screen only**, connect the camera after `on_start` and after CAMERA permission has been granted, and not from `on_enter`.  
 
 ### Preview Widget Properties
 
