@@ -3,7 +3,7 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
-2023/02/09 : Android users: camerax_provider has been updated to version 0.0.3
+2023/02/09 : Android users: camerax_provider has been updated to version 0.0.3, and when updating see also [enable_video](#enable_video).
 
 - [Overview](#overview)
 - [Install](#install)
@@ -39,6 +39,7 @@ Camera4Kivy
       - [enable_analyze_imageproxy](#enable_analyze_imageproxy)
       - [enable_zoom_gesture](#enable_zoom_gesture)
       - [enable_focus_gesture](#enable_focus_gesture)
+      - [enable_video](#enable_video)
       - [imageproxy_data_format](#imageproxy_data_format)
     + [Disconnect Camera](#disconnect-camera)
     + [Capture](#capture)
@@ -321,6 +322,11 @@ Default True.  Android and iOS only.
 ##### enable_focus_gesture
 Default True. Android only.
        
+##### enable_video
+Default True. Android only.
+
+By default Preview is configured to implement photo and video capture. Some low end Android devices may not behave correctly if video capture is enabled and `enable_analyze_pixels = True`. In this case set `enable_video = False`. In part this is due to changes to the Android camera api implementatiom. 
+       
 ##### imageproxy_data_format
 Applies only to the Android ImageProxy api. 'yuv420' (default) or 'rgba'.
 
@@ -571,9 +577,15 @@ Image analysis is enabled with a parameter to `connect_camera()`:
 
 `connect_camera(enable_analyze_pixels = True)`
 
-To change the default analysis resolution specify the number of pixels in the long edge (the default is the smaller of 1024 or the cropped resolution):
+To change the default analysis resolution specify the number of pixels in the long edge (the default is the smaller of 1024 or the cropped resolution) as shown below.
 
-`connect_camera(enable_analyze_pixels = True, analyze_pixels_resolution = 720)`
+Also some low end Android devices may not support being configured to analayze images and record video at the same. Since by default Preview is configured to record video, if your device has an unexpected issue set `enable_video=False`.
+
+```python
+connect_camera(enable_analyze_pixels = True,
+               analyze_pixels_resolution = 720,
+               enable_video = False)
+```
 
 The `analyze_pixels_resolution` option provides analysis images with the same orientation and aspect ratio as the Preview. 
 
