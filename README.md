@@ -361,11 +361,11 @@ For example `self.capture_photo(subdir='foo', name='bar')`
 
 The default values are as follows:
 
-On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`, and on iOS <location> is the Photos App.
+ - On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`, and on iOS <location> is the Photos App.
 
-The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'.
+ - The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'.
 
-The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
+ - The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
 
 The [filepath_callback](https://github.com/Android-for-Python/Camera4Kivy#filepath_callback) occurs on capture completion, with an argument that is the actual path for a particular capture. 
 
