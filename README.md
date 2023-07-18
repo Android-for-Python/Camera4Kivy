@@ -356,11 +356,15 @@ Video capture is only available on Android, Picamera2, or OpenCV camera provider
 Captures are never mirrored, except a screenshot capture if the Preview is mirrored. Capture resolution is discussed [here](https://github.com/Android-for-Python/Camera4Kivy#capture-resolution).
 
 Captures are saved to `<location>/<subdir>/<name>.jpg` or `.mp4`.
+
 For example `self.capture_photo(subdir='foo', name='bar')`
 
 The default values are as follows:
+
 On a desktop `<location>` is the current directory `.`, on Android `<location>` is `DCIM/<appname>`, and on iOS <location> is the Photos App.
+
 The value of `<subdir>` is the current date, the format is 'YYYY_MM_DD'.
+
 The value of `<name>` is the current time, the format is 'hh_mm_ss_xx' (xx is 1/100 sec).
 
 The [filepath_callback](https://github.com/Android-for-Python/Camera4Kivy#filepath_callback) occurs on capture completion, with an argument that is the actual path for a particular capture. 
