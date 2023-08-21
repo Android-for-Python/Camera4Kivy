@@ -50,6 +50,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
         self.enable_zoom_gesture = False
         self.enable_focus_gesture  = False
         self.block_pipeline = True
+        self._fbo = None
     
     ##############################
     # Lifecycle events
@@ -415,7 +416,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             
     def block_and_clear_pipeline(self):
         self.block_pipeline = True
-        if self._camera and self._fbo.texture:
+        if self._camera and self._fbo and self._fbo.texture:
             tex_size = self._fbo.texture.size
             buf = bytes([255] * tex_size[0] * tex_size[1] * 4)
             self._fbo.texture.blit_buffer(buf, colorfmt='rgba',
@@ -425,7 +426,8 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
 
     def _schedule_pipeline(self):
         self._deschedule_pipeline()
-        if self._camera and self._camera_texture and self._fbo.texture:
+        if self._camera and self._camera_texture and self._fbo and\
+           self._fbo.texture:
             self._set_surface_provider(True)
             self.block_pipeline = False
             self._update_ev = Clock.schedule_interval(self._update_pipeline,
@@ -438,7 +440,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             self._update_ev = None
 
     def _update_pipeline(self, dt):
-        if self._camera.imageReady() and not self.block_pipeline:
+        if self._camera.imageReady() and self._fbo and not self.block_pipeline:
             self._camera_texture_cb.ask_update() 
             self._fbo.draw()  
             self._analyze_texture()
@@ -452,23 +454,24 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
     # Run on mainthread because required by Kivy canvas
     @mainthread
     def _update_canvas(self):
-        tex = self._fbo.texture.get_region(*self.crop)
+        if self._fbo:
+            tex = self._fbo.texture.get_region(*self.crop)
 
-        # moved from create_fbo
-        if self.facing == 'front':
-            view_size = (-self.view_size[0], self.view_size[1])
-            view_pos = (self.view_pos[0] + self.view_size[0],
-                        self.view_pos[1])
-        else:
-            view_size = self.view_size
-            view_pos  = self.view_pos
+            # moved from create_fbo
+            if self.facing == 'front':
+                view_size = (-self.view_size[0], self.view_size[1])
+                view_pos = (self.view_pos[0] + self.view_size[0],
+                            self.view_pos[1])
+            else:
+                view_size = self.view_size
+                view_pos  = self.view_pos
         
-        self.canvas.clear()
-        with self.canvas:
-            Color(1,1,1,1)
-            Rectangle(texture= tex, size = view_size, pos = view_pos)
-            if self.canvas_callback:
-                self.canvas_callback(tex, view_size, view_pos)
+            self.canvas.clear()
+            with self.canvas:
+                Color(1,1,1,1)
+                Rectangle(texture= tex, size = view_size, pos = view_pos)
+                if self.canvas_callback:
+                    self.canvas_callback(tex, view_size, view_pos)
 
     #######################################
     # Storage Location
@@ -554,7 +557,7 @@ class PreviewCameraX(PreviewCommon, CommonGestures):
             self.callback(str(file_id))
 
     def _analyze_texture(self):
-        if not self.enable_data and self._analyze_callback:
+        if not self.enable_data and self._fbo and self._analyze_callback:
             tex = self._fbo.texture.get_region(*self.crop)
             self._analyze_callback(tex, self.view_pos,
                                    self.tscale, self.facing=='front')
