@@ -103,7 +103,7 @@ In Python
     self.preview = Preview(aspect_ratio = '16:9')
 ```
 
-To connect the camera unit to the Preview call the preview's `connect_camera()` method, **after on_start()**. For example to connect the camera with the image analysis api enabled :
+To connect the camera unit to the Preview call the preview's `connect_camera()` method, **at least one timestep after on_start()**. For example to connect the camera with the image analysis api enabled :
 
 ```python
     self.preview.connect_camera(enable_analyze_pixels = True)
@@ -153,7 +153,7 @@ The implementation of the camerax gradle dependencies is architecture specific, 
 
 #### Run Time Permissions
 
-The following run time permissions must be in be requested in the app. As usual request these in build() or after on_start(). See the examples.
+The following run time permissions must be in be requested in the app. As usual request these at least one timestep after on_start(). See the examples.
 
 Always required: `CAMERA`
 
