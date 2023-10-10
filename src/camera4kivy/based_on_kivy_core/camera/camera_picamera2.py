@@ -194,8 +194,7 @@ class CameraPi2():
         self.configure_sensor(index)
         self.picam2.configure(self.preview_config)
         self.sensor= SensorInterface()
-        self.sensor.start(self.picam2)
-        self.picam2.attach_preview(self.sensor)
+        self.picam2.start_preview(self.sensor)
         self.base_scaler_crop = self.crop_limits
         self.scaler_crop = self.crop_limits
         self.picam2.start()
