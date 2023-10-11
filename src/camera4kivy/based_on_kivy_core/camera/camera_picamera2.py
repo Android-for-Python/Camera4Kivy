@@ -3,6 +3,7 @@ PiCamera2 Camera: Implement CameraBase with PiCamera2
 '''
 
 __all__ = ('CameraPiCamera2', )
+import io
 
 from kivy.logger import Logger
 from kivy.clock import Clock, mainthread
@@ -39,6 +40,7 @@ class SensorInterface(NullPreview):
         self.y = None
         self.u = None
         self.v = None
+        self.mjpeg = None
         self.stream_size = ()
 
     # Sync event loops
@@ -48,6 +50,10 @@ class SensorInterface(NullPreview):
         self.y = y
         self.u = u
         self.v = v
+
+    @mainthread
+    def sync_mjpeg(self,mjpeg):
+        self.mjpeg = mjpeg
     
     # Request Handlers
     ###################
@@ -75,6 +81,9 @@ class SensorInterface(NullPreview):
                     v = bytes(mm[end_u:])
                     self.sync_yuv(y,u,v)
                                 
+                elif self.stream_fmt == 'MJPEG':
+                    self.sync_mjpeg(bytes(mm))
+                    
                 elif self.stream_fmt and not self.mute:
                     self.mute = True
                     Logger.error(
@@ -163,6 +172,7 @@ class CameraPi2():
         self._rotate = 0
         self.video_recording = False
         self.audio = False
+        self.is_usb = False
 
     # Start
     # Choose sensor, configure pc2
@@ -184,22 +194,33 @@ class CameraPi2():
             Logger.warning('C4k Picamera2: Requested camera '+ str(index) +\
                            ' not found, using ' + str(num_cameras -1) + ' .')
             index = num_cameras -1
-        Id = Picamera2.global_camera_info()[index]['Id']
-        if 'i2c' not in Id.lower():
-            Logger.error('C4k Picamera2: USB cameras not supported.')
-            return
 
         # initialize 
+        Id = Picamera2.global_camera_info()[index]['Id']
         self.picam2 = Picamera2(index)
-        self.configure_sensor(index)
+        if 'i2c' in Id.lower():
+            self.is_usb = False
+            self.create_picam_configurations(index)
+        else:
+            self.is_usb = True
+            self.create_usb_configurations()
+        self.base_scaler_crop = self.crop_limits 
+        self.scaler_crop = self.crop_limits
         self.picam2.configure(self.preview_config)
         self.sensor= SensorInterface()
         self.picam2.start_preview(self.sensor)
-        self.base_scaler_crop = self.crop_limits
-        self.scaler_crop = self.crop_limits
         self.picam2.start()
 
-    def configure_sensor(self, index):
+    def create_usb_configurations(self):
+        self.crop_limits = None
+        self.preview_config = self.picam2.create_preview_configuration(
+            {"format": "MJPEG"})
+        self.photo_config = self.picam2.create_still_configuration(
+            {"format": "MJPEG"})
+        self.video_config = self.picam2.create_video_configuration(
+            {"format": "MJPEG"})  # Not supported
+
+    def create_picam_configurations(self, index):
         # Sensor configuration
         size_s = (0,0)
         wide = self._context.aspect_ratio == '16:9'
@@ -281,6 +302,12 @@ class CameraPi2():
         if ss and ss.y:
             return self._yuv_to_rgba('YUV420', ss.y, ss.u, ss.v,
                                      ss.stream_size, self._resolution)
+        elif ss and ss.mjpeg:
+            img = Image.open(io.BytesIO(ss.mjpeg))
+            img = img.convert('RGBA')
+            img = img.rotate(self._rotate)
+            img = img.resize(self._resolution)
+            return img.tobytes()
         return None            
 
     # Zoom and Drag events
@@ -333,20 +360,19 @@ class CameraPi2():
         request = self.picam2.capture_request()
         size = request.config['main']['size']
         with _MappedBuffer(request,'main') as pixels:
-            img = Image.frombytes('RGB', size, bytes(pixels))
+            if self.is_usb:
+                img = Image.open(io.BytesIO(pixels))
+            else:
+                img = Image.frombytes('RGB', size, bytes(pixels))
         request.release()
         if self._rotate in [90,270]:
             size = size[::-1]
         crop = self._context.crop_for_aspect_orientation(size[0],
                                                          size[1])
-        if self._rotate in [90,270]:
-            t = crop[2]
-            crop[2] = crop[3]
-            crop[3] = t
-        bottom = crop[3] - crop[1]
+        bottom = crop[3] + crop[1]
         right = crop[2] + crop[0]
-        img = img.crop((crop[0], crop[1], right, bottom))
         img = img.rotate(self._rotate, expand = True)
+        img = img.crop((crop[0], crop[1], right, bottom))
         with open(file_output, 'wb') as fp:
             img.save(fp)
         if callback:
@@ -356,9 +382,12 @@ class CameraPi2():
     def switch_config(self, new_config):
         self.picam2.stop()
         self.picam2.configure(new_config)
-        self.picam2.controls.ScalerCrop = self.scaler_crop
-        self.picam2.start()
-        self.picam2.controls.ScalerCrop = self.scaler_crop  
+        if self.is_usb:
+            self.picam2.start()
+        else:
+            self.picam2.controls.ScalerCrop = self.scaler_crop
+            self.picam2.start()
+            self.picam2.controls.ScalerCrop = self.scaler_crop
         
     def photo(self, path, callback):
         if self.picam2 and self.sensor and not self.video_recording:
@@ -369,7 +398,10 @@ class CameraPi2():
     # Video start/stop
     ###############################
 
-    def video_start(self, filepath, callback): 
+    def video_start(self, filepath, callback):
+        if self.is_usb:
+            Logger.error('Camera4Kivy, USB video recording not supported.')
+            return
         self.video_filepath = filepath
         self.video_callback = callback
         if self.picam2 and self.sensor:
@@ -381,6 +413,8 @@ class CameraPi2():
             self.picam2.start_encoder(encoder, output)
 
     def video_stop(self):
+        if self.is_usb:
+            return
         self.picam2.stop_encoder()
         self.picam2.switch_mode(self.preview_config)
         self.video_recording = False

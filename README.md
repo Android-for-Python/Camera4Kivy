@@ -746,7 +746,9 @@ Depends on the Linux flavor, but commonly:
 ### Picamera
 This uses either the Picamera or Picamera2 package, depending on which is installed (they are mutually exclusive).
 
-If Picamera2 is installed there are additional features for native Pi cameras: higher resolution photos, video (optionally with audio), zoom, pan when zoom'd, sensor rotation. However USB cameras are not currently supported. 
+If Picamera2 is installed there are additional features for native Pi cameras: higher resolution photos, video (optionally with audio), zoom, pan when zoom'd, sensor rotation.
+
+For Picamera2 USB cameras are available with physical rotation support, including for photo and screen shot capture. However zoom and video capture is not available. 
 
 ### AVFoundation
 Pre-installed
