@@ -3,6 +3,8 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
+**2023-11-13 This repository is archived.**
+
 2023/02/09 : Android users: camerax_provider has been updated to version 0.0.3, and when updating see also [enable_video](#enable_video).
 
 - [Overview](#overview)
@@ -149,7 +151,7 @@ Set `p4a.hook` to enable the app's use of the [camera provider](https://github.c
 
 `p4a.hook = camerax_provider/gradle_options.py`
 
-The implementation of the camerax gradle dependencies is architecture specific, an app built for armeabi-v7a will crash on an arm64-v8a device.
+The implementation of the camerax gradle dependencies is architecture specific, an app built for *only* armeabi-v7a will crash on an arm64-v8a device.
 
 #### Run Time Permissions
 
