@@ -3,6 +3,8 @@ Camera4Kivy
 
 *Yet Another Camera for Kivy*
 
+**2023-11-13 This repository is archived.**
+
 2023/02/09 : Android users: camerax_provider has been updated to version 0.0.3
 
 - [Overview](https://github.com/Android-for-Python/Camera4Kivy#overview)
